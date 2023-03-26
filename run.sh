@@ -13,4 +13,4 @@ cd wasm &&
 /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
   --user-data-dir=./.user_data \
   --enable-features=SharedArrayBuffer \
-  http://localhost:8000/euclid.html
+  http://localhost:8000

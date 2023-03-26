@@ -1,7 +1,7 @@
 #!/bin/bash
 
 mkdir -p wasm &&
-cp euclid.html wasm &&
+#cp euclid.html wasm &&
 cd wasm &&
-emcmake cmake -D_wasm=ON .. &&
+emcmake cmake -Ddebug=ON .. &&
 cmake --build .

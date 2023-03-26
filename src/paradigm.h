@@ -6,7 +6,7 @@
 #ifdef __EMSCRIPTEN__
 
 #include <emscripten.h>
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 
 #else
 

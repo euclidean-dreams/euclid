@@ -7,6 +7,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 project(euclid)
 include(lib/cmake-utils/dependency-integrator.cmake)
 
+option(debug "debug" OFF)
+
+
 ############
 ## source ##
 ############
@@ -21,10 +24,10 @@ set(
         src/foundation/interfaces.h
         src/foundation/time.h
 
-        src/shaping/audio_input.h
-        src/shaping/ring_buffer.h
-        #        src/shaping/stft.h
-)
+        src/ingress/audio_input.h
+        src/ingress/ring_buffer.h
+        src/ingress/stft.h
+        src/egress/opus.h src/foundation/primitive.h)
 add_executable(euclid ${SOURCE_FILES})
 target_include_directories(euclid PRIVATE src)
 
@@ -32,9 +35,19 @@ target_include_directories(euclid PRIVATE src)
 ### WASM ##
 ###########
 if (EMSCRIPTEN)
-    message("building for wasm")
+    message("(~) building for wasm")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sUSE_SDL=2")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sUSE_PTHREADS=1")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sALLOW_MEMORY_GROWTH")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sMAXIMUM_MEMORY=4GB")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sPTHREAD_POOL_SIZE=8")
+    if (debug)
+        message("(~) [x] emcc debug")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sASSERTIONS")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --memoryprofiler")
+    else ()
+        message("(~) [ ] emcc debug")
+    endif ()
     add_compile_definitions(WASM EMSCRIPTEN)
 else ()
     message("not building for wasm")
