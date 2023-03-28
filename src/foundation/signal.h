@@ -35,6 +35,14 @@ public:
     typename vec<T>::iterator end() {
         return samples.end();
     }
+
+    T *get_data_pointer() {
+        return samples.data();
+    }
+
+    size_t size() {
+        return samples.size();
+    }
 };
 
 

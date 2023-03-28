@@ -15,19 +15,22 @@ option(debug "debug" OFF)
 ############
 set(
         SOURCE_FILES
+        src/main.cpp
+        src/euclid.h
+        src/opus.h
         src/paradigm.h
         src/foundation.h
 
-        src/main.cpp
-        src/euclid.h
-
         src/foundation/interfaces.h
         src/foundation/time.h
+        src/foundation/primitive.h
 
         src/ingress/audio_input.h
         src/ingress/ring_buffer.h
         src/ingress/stft.h
-        src/egress/opus.h src/foundation/primitive.h)
+
+        src/cosmology/cosmology.h
+)
 add_executable(euclid ${SOURCE_FILES})
 target_include_directories(euclid PRIVATE src)
 

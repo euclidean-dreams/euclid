@@ -46,9 +46,7 @@ public:
         if (input_signals.size() < window_size / hop_size) {
             // waiting for enough input signals to operate on...
             input_signals.push_back(mv(signal));
-            auto result = mkup<Signal<cmplx>>();
-            result->populate(FRAME_SIZE, {0, 0});
-            return result;
+            return nullptr;
         } else {
             // we have enough input signals
             input_signals.pop_front();
