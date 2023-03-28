@@ -19,7 +19,11 @@ public:
         desired_spec.freq = 44100;
         desired_spec.format = AUDIO_F32SYS;
         desired_spec.channels = 1;
-        desired_spec.samples = frame_size;
+        if (frame_size >= 256) {
+            desired_spec.samples = frame_size;
+        } else {
+            desired_spec.samples = 256;
+        }
         desired_spec.callback = recording_callback;
         desired_spec.userdata = &ring_buffer;
         auto audio_device = SDL_OpenAudioDevice(nullptr, 1, &desired_spec, &actual_spec, 0);

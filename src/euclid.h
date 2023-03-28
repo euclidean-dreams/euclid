@@ -8,7 +8,9 @@
 
 namespace PROJECT_NAMESPACE {
 
-int FRAME_SIZE = 512;
+// power of 2 >= 256
+int FRAME_SIZE = 256;
+
 int RENDER_TICK_INTERVAL = 8000;
 int RENDER_WIDTH = 512;
 int RENDER_HEIGHT = 512;
