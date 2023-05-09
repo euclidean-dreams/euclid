@@ -29,8 +29,7 @@ set(
         src/ingress/ring_buffer.h
         src/ingress/stft.h
 
-        src/cosmology/cosmology.h
-)
+        src/ingress/harmonic_transform.h src/cosmology/spectrogram.h)
 add_executable(euclid ${SOURCE_FILES})
 target_include_directories(euclid PRIVATE src)
 

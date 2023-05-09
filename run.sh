@@ -1,12 +1,4 @@
 #!/bin/bash
-
-cd wasm &&
-  python3 -m http.server &
-# if address in use:
-# sudo lsof -i:8000
-# then kill that pid
-
-
 # launches a browser for euclid
 # due to this issue https://stackoverflow.com/questions/68592278/sharedarraybuffer-is-not-defined
 
