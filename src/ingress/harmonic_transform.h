@@ -10,9 +10,9 @@ private:
     vec<vec<double>> harmonic_signal_snapshots;
     vec<vec<double>> low_phi_correlation_signals;
     double squish_factor = 2.0;
-    int max_partials = 10;
+    int max_partials = 5;
     int consideration_offset = 3 * scast<int>(std::floor(squish_factor));
-    int initial_phi = 10;
+    int initial_phi = 3;
     int max_phi_divisor = 2;
     double harmonic_signal_magnitude_multiplier = 100;
     double harmonic_signal_peak_decay = 0.1;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <list>
 #include <spdlog/spdlog.h>
 
 #ifdef __EMSCRIPTEN__

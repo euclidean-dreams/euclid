@@ -67,6 +67,7 @@ public:
 
                 auto index = x + y * width;
                 if (index < result->size()) {
+
                     result->set_sample(x + y * width, Pixel{harmonic_value, 0, stft_value});
                 }
             }
