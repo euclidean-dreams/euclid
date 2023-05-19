@@ -30,7 +30,7 @@ set(
         src/ingress/stft.h
 
         src/ingress/harmonic_transform.h src/cosmology/spectrogram.h
-)
+        src/cosmology/lumion.h)
 add_executable(euclid ${SOURCE_FILES})
 target_include_directories(euclid PRIVATE src)
 

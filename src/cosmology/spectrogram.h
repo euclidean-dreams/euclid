@@ -5,7 +5,7 @@
 
 namespace PROJECT_NAMESPACE {
 
-class Spectrogram : NonCopyable {
+class Spectrogram : public NonCopyable {
 private:
     int width;
     int height;
