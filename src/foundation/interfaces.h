@@ -6,17 +6,17 @@
 
 namespace PROJECT_NAMESPACE {
 
-class NonCopyable {
+class Entity {
 public:
-    NonCopyable(const NonCopyable &) = delete;
+    Entity(const Entity &) = delete;
 
-    NonCopyable &operator=(const NonCopyable &) = delete;
+    Entity &operator=(const Entity &) = delete;
 
 protected:
-    NonCopyable() = default;
+    Entity() = default;
 };
 
-class Circlet : public NonCopyable {
+class Circlet : public Entity {
 public:
     virtual ~Circlet() = default;
 

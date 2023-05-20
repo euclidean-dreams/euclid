@@ -5,7 +5,7 @@
 
 namespace PROJECT_NAMESPACE {
 
-class SDLAudioInput : public NonCopyable {
+class SDLAudioInput : public Entity {
 private:
     SDL_AudioSpec desired_spec{};
     SDL_AudioSpec actual_spec{};

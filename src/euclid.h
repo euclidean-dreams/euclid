@@ -38,12 +38,8 @@ private:
             auto magnitude = scast<float>(std::sqrt(std::pow(sample.real(), 2) + std::pow(sample.imag(), 2)));
             stft_magnitudes->push_back(magnitude);
         }
-        auto harmonic_signal = harmonic_transform->transform(stft_magnitudes);
-        if (harmonic_signal == nullptr) {
-            return;
-        }
 
-        cosmology->process(mv(stft_magnitudes), mv(harmonic_signal));
+        cosmology->process(mv(stft_magnitudes));
     }
 
 public:

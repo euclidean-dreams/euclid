@@ -22,15 +22,17 @@ set(
         src/foundation.h
 
         src/foundation/interfaces.h
-        src/foundation/time.h
         src/foundation/primitive.h
+        src/foundation/time.h
 
         src/ingress/audio_input.h
+        src/ingress/harmonic_transform.h
         src/ingress/ring_buffer.h
         src/ingress/stft.h
 
-        src/ingress/harmonic_transform.h src/cosmology/spectrogram.h
-        src/cosmology/lumion.h)
+        src/cosmology/spectrogram.h
+        src/cosmology/psyche.h
+)
 add_executable(euclid ${SOURCE_FILES})
 target_include_directories(euclid PRIVATE src)
 

@@ -12,7 +12,7 @@ enum class WindowFunction {
     hann = 1
 };
 
-class FourierTransform : public NonCopyable {
+class FourierTransform : public Entity {
 private:
     WindowFunction window_function = WindowFunction::hamming;
     int hop_size = 1;

@@ -5,7 +5,7 @@
 
 namespace PROJECT_NAMESPACE {
 
-class HarmonicTransform : public NonCopyable {
+class HarmonicTransform : public Entity {
 private:
     vec<vec<double>> harmonic_signal_snapshots;
     vec<vec<double>> low_phi_correlation_signals;

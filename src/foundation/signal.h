@@ -6,7 +6,7 @@
 namespace PROJECT_NAMESPACE {
 
 template<class T>
-class Signal : public NonCopyable {
+class Signal : public Entity {
 private:
     vec<T> samples{};
 
