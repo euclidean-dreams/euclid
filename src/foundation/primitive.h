@@ -28,6 +28,12 @@ struct Pixel {
         color |= ((uint32_t) char_red << 16);
         color |= ((uint32_t) char_alpha << 24);
     }
+
+    static int trim(int value) {
+        if (value > 255) value = 255;
+        if (value < 0) value = 0;
+        return value;
+    }
 };
 
 }

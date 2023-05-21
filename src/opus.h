@@ -13,8 +13,11 @@ class Opus {
 
 public:
     Opus(int width, int height) : width{width}, height{height} {
-        auto flags = 0;
-        SDL_CreateWindowAndRenderer(width, height, flags, &window, &renderer);
+        SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
+        window = SDL_CreateWindow("euclid", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height,
+                                  SDL_WINDOW_BORDERLESS);
+        Uint32 rendererFlags = SDL_RENDERER_ACCELERATED;
+        renderer = SDL_CreateRenderer(window, -1, rendererFlags);
         texture = SDL_CreateTexture(
                 renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height
         );

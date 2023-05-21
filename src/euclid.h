@@ -14,11 +14,10 @@ int FRAME_SIZE = 256;
 
 int RENDER_TICK_INTERVAL = 4000;
 int RENDER_WIDTH = 512;
-int RENDER_HEIGHT = 512;
+int RENDER_HEIGHT = 900;
 
 up<SDLAudioInput> audio_input;
 up<FourierTransform> fourier_transform;
-up<HarmonicTransform> harmonic_transform;
 up<Opus> opus;
 up<Spectrogram> cosmology;
 
@@ -72,7 +71,6 @@ void bootstrap() {
     spdlog::info("( ) ingress");
     audio_input = mkup<SDLAudioInput>(FRAME_SIZE);
     fourier_transform = mkup<FourierTransform>();
-    harmonic_transform = mkup<HarmonicTransform>();
     spdlog::info("(~) ingress");
     spdlog::info("( ) egress");
     opus = mkup<Opus>(RENDER_WIDTH, RENDER_HEIGHT);
@@ -93,6 +91,24 @@ void bootstrap() {
         SDL_WaitEvent(&event);
         if (event.type == SDL_QUIT) {
             running = false;
+        } else if (event.type == SDL_KEYDOWN) {
+
+            auto symbol = event.key.keysym.sym;
+            auto keymod = event.key.keysym.mod;
+            auto shift_held_down = SDLK_LSHIFT & keymod;
+            auto multiplier = 1;
+            if (shift_held_down) {
+                multiplier = 10;
+            }
+            if (symbol == SDLK_UP) {
+                cosmology->shift_view(15 * multiplier);
+            } else if (symbol == SDLK_DOWN) {
+                cosmology->shift_view(-15 * multiplier);
+            } else if (symbol == SDLK_RIGHTBRACKET) {
+                cosmology->scale_color_gain(0.5 * multiplier);
+            } else if (symbol == SDLK_LEFTBRACKET) {
+                cosmology->scale_color_gain(-0.5 * multiplier);
+            }
         }
     }
 #endif
