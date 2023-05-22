@@ -17,7 +17,7 @@ set(
         SOURCE_FILES
         src/main.cpp
         src/euclid.h
-        src/opus.h
+        src/egress/opus.h
         src/paradigm.h
         src/foundation.h
 
@@ -26,11 +26,10 @@ set(
         src/foundation/time.h
 
         src/ingress/audio_input.h
-        src/ingress/harmonic_transform.h
         src/ingress/ring_buffer.h
         src/ingress/stft.h
 
-        src/cosmology/spectrogram.h
+        src/egress/spectrogram.h
         src/cosmology/psyche.h
 )
 add_executable(euclid ${SOURCE_FILES})

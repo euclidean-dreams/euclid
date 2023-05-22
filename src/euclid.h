@@ -3,25 +3,30 @@
 #include "foundation.h"
 #include "ingress/audio_input.h"
 #include "ingress/stft.h"
-#include "opus.h"
-#include "cosmology/spectrogram.h"
-#include "ingress/harmonic_transform.h"
+#include "egress/opus.h"
+#include "cosmology/psyche.h"
+#include "egress/spectrogram.h"
 
 namespace PROJECT_NAMESPACE {
 
 // power of 2 >= 256
 int FRAME_SIZE = 256;
+int LUMION_COUNT = 900;
+
 
 int RENDER_TICK_INTERVAL = 4000;
-int RENDER_WIDTH = 512;
+int RENDER_WIDTH = 1200;
 int RENDER_HEIGHT = 900;
 
 up<SDLAudioInput> audio_input;
 up<FourierTransform> fourier_transform;
+up<Spectrogram> stft_spectrogram;
+up<Spectrogram> perception_spectrogram;
 up<Opus> opus;
-up<Spectrogram> cosmology;
+up<Psyche> psyche;
 
 uint64_t last_render_time = 0;
+bool render_toggle = true;
 
 class Euclid : public Circlet {
 private:
@@ -37,8 +42,9 @@ private:
             auto magnitude = scast<float>(std::sqrt(std::pow(sample.real(), 2) + std::pow(sample.imag(), 2)));
             stft_magnitudes->push_back(magnitude);
         }
-
-        cosmology->process(mv(stft_magnitudes));
+        stft_spectrogram->process(stft_magnitudes);
+        auto perception = psyche->perceive(stft_magnitudes);
+        perception_spectrogram->process(perception);
     }
 
 public:
@@ -48,7 +54,13 @@ public:
         }
         if (get_current_time() - last_render_time > RENDER_TICK_INTERVAL) {
             last_render_time = get_current_time();
-            auto pixels = cosmology->observe();
+
+            up<Signal<Pixel>> pixels;
+            if (render_toggle) {
+                pixels = stft_spectrogram->observe();
+            } else {
+                pixels = perception_spectrogram->observe();
+            }
             opus->render(mv(pixels));
         }
     }
@@ -73,11 +85,13 @@ void bootstrap() {
     fourier_transform = mkup<FourierTransform>();
     spdlog::info("(~) ingress");
     spdlog::info("( ) egress");
+    stft_spectrogram = mkup<Spectrogram>(RENDER_WIDTH, RENDER_HEIGHT);
+    perception_spectrogram = mkup<Spectrogram>(RENDER_WIDTH, RENDER_HEIGHT);
     opus = mkup<Opus>(RENDER_WIDTH, RENDER_HEIGHT);
     spdlog::info("(~) egress");
-    spdlog::info("( ) cosmology");
-    cosmology = mkup<Spectrogram>(RENDER_WIDTH, RENDER_HEIGHT);
-    spdlog::info("(~) cosmology");
+    spdlog::info("( ) stft_spectrogram");
+    psyche = mkup<Psyche>(LUMION_COUNT);
+    spdlog::info("(~) stft_spectrogram");
     spdlog::info("(~) Initialized euclid");
 
 #ifdef __EMSCRIPTEN__
@@ -92,7 +106,6 @@ void bootstrap() {
         if (event.type == SDL_QUIT) {
             running = false;
         } else if (event.type == SDL_KEYDOWN) {
-
             auto symbol = event.key.keysym.sym;
             auto keymod = event.key.keysym.mod;
             auto shift_held_down = SDLK_LSHIFT & keymod;
@@ -101,13 +114,19 @@ void bootstrap() {
                 multiplier = 10;
             }
             if (symbol == SDLK_UP) {
-                cosmology->shift_view(15 * multiplier);
+                stft_spectrogram->shift_view(15 * multiplier);
+                perception_spectrogram->shift_view(15 * multiplier);
             } else if (symbol == SDLK_DOWN) {
-                cosmology->shift_view(-15 * multiplier);
+                stft_spectrogram->shift_view(-15 * multiplier);
+                perception_spectrogram->shift_view(-15 * multiplier);
             } else if (symbol == SDLK_RIGHTBRACKET) {
-                cosmology->scale_color_gain(0.5 * multiplier);
+                stft_spectrogram->scale_color_gain(0.5 * multiplier);
+                perception_spectrogram->scale_color_gain(0.5 * multiplier);
             } else if (symbol == SDLK_LEFTBRACKET) {
-                cosmology->scale_color_gain(-0.5 * multiplier);
+                stft_spectrogram->scale_color_gain(-0.5 * multiplier);
+                perception_spectrogram->scale_color_gain(-0.5 * multiplier);
+            } else if (symbol == SDLK_SPACE) {
+                render_toggle = !render_toggle;
             }
         }
     }

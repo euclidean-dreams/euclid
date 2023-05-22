@@ -9,7 +9,7 @@ class Spectrogram : public Entity {
 private:
     int width;
     int height;
-    lst<sp<Signal<float>>> stft_frames;
+    lst<sp<Signal<float>>> signals;
     int view_index = 0;
     float color_gain = 1.2;
 
@@ -17,20 +17,20 @@ public:
     Spectrogram(int width, int height)
             : width{width},
               height{height},
-              stft_frames{} {
+              signals{} {
     }
 
-    void process(sp<Signal<float>> stft) {
-        stft_frames.push_back(mv(stft));
-        while (stft_frames.size() > width) {
-            stft_frames.pop_front();
+    void process(sp<Signal<float>> signal) {
+        signals.push_back(mv(signal));
+        while (signals.size() > width) {
+            signals.pop_front();
         }
     }
 
     void shift_view(int delta) {
         view_index += delta;
-        auto stft_size = (*stft_frames.begin())->size();
-        if (view_index + height > stft_size) view_index = stft_size - height;
+        auto size = (*signals.begin())->size();
+        if (view_index + height > size) view_index = size - height;
         if (view_index < 0) view_index = 0;
     }
 
@@ -42,23 +42,23 @@ public:
     up<Signal<Pixel>> observe() {
         auto result = mkup<Signal<Pixel>>();
         result->populate(width * height, Pixel{0, 0, 0});
-        auto stft_frames_iterator = stft_frames.begin();
+        auto cur_signal = signals.begin();
         for (int x = 0; x < width; x++) {
-            if (stft_frames_iterator == stft_frames.end()) {
+            if (cur_signal == signals.end()) {
                 break;
             }
-            auto stft_iterator = (*stft_frames_iterator)->begin();
+            auto cur_value = (*cur_signal)->begin();
             for (int trimmed = 0; trimmed < view_index; trimmed++) {
-                stft_iterator++;
+                cur_value++;
             }
-            auto stft_end_iterator = (*stft_frames_iterator)->end();
+            auto cur_value_end = (*cur_signal)->end();
             for (int y = height - 1; y >= 0; y--) {
                 int magnitude;
-                if (stft_iterator == stft_end_iterator) {
+                if (cur_value == cur_value_end) {
                     magnitude = 100;
                 } else {
-                    magnitude = scast<int>(*stft_iterator) * color_gain;
-                    stft_iterator++;
+                    magnitude = scast<int>(*cur_value) * color_gain;
+                    cur_value++;
                 }
                 if (magnitude < 0) magnitude = 0;
                 auto red = Pixel::trim(magnitude);
@@ -69,9 +69,8 @@ public:
                 if (index < result->size()) {
                     result->set_sample(x + y * width, Pixel{red, green, blue});
                 }
-
             }
-            stft_frames_iterator++;
+            cur_signal++;
         }
         return result;
     }
