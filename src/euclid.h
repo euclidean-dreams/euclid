@@ -11,19 +11,15 @@ namespace PROJECT_NAMESPACE {
 
 // power of 2 >= 256
 int FRAME_SIZE = 256;
-int LUMION_COUNT = 900;
 
-
-int RENDER_TICK_INTERVAL = 4000;
-int RENDER_WIDTH = 1200;
-int RENDER_HEIGHT = 900;
+int RENDER_TICK_INTERVAL = 2000;
+int RENDER_WIDTH = 1000;
+int RENDER_HEIGHT = 800;
 
 up<SDLAudioInput> audio_input;
 up<FourierTransform> fourier_transform;
-up<Spectrogram> stft_spectrogram;
-up<Spectrogram> perception_spectrogram;
+up<Spectrogram> spectrogram;
 up<Opus> opus;
-up<Psyche> psyche;
 
 uint64_t last_render_time = 0;
 bool render_toggle = true;
@@ -42,9 +38,7 @@ private:
             auto magnitude = scast<float>(std::sqrt(std::pow(sample.real(), 2) + std::pow(sample.imag(), 2)));
             stft_magnitudes->push_back(magnitude);
         }
-        stft_spectrogram->process(stft_magnitudes);
-        auto perception = psyche->perceive(stft_magnitudes);
-        perception_spectrogram->process(perception);
+        spectrogram->process(stft_magnitudes);
     }
 
 public:
@@ -54,19 +48,13 @@ public:
         }
         if (get_current_time() - last_render_time > RENDER_TICK_INTERVAL) {
             last_render_time = get_current_time();
-
-            up<Signal<Pixel>> pixels;
-            if (render_toggle) {
-                pixels = stft_spectrogram->observe();
-            } else {
-                pixels = perception_spectrogram->observe();
-            }
+            auto pixels = spectrogram->observe();
             opus->render(mv(pixels));
         }
     }
 
     uint64_t get_tick_interval() override {
-        return RENDER_TICK_INTERVAL / 10;
+        return RENDER_TICK_INTERVAL;
     }
 };
 
@@ -85,13 +73,9 @@ void bootstrap() {
     fourier_transform = mkup<FourierTransform>();
     spdlog::info("(~) ingress");
     spdlog::info("( ) egress");
-    stft_spectrogram = mkup<Spectrogram>(RENDER_WIDTH, RENDER_HEIGHT);
-    perception_spectrogram = mkup<Spectrogram>(RENDER_WIDTH, RENDER_HEIGHT);
+    spectrogram = mkup<Spectrogram>(RENDER_WIDTH, RENDER_HEIGHT);
     opus = mkup<Opus>(RENDER_WIDTH, RENDER_HEIGHT);
     spdlog::info("(~) egress");
-    spdlog::info("( ) stft_spectrogram");
-    psyche = mkup<Psyche>(LUMION_COUNT);
-    spdlog::info("(~) stft_spectrogram");
     spdlog::info("(~) Initialized euclid");
 
 #ifdef __EMSCRIPTEN__
@@ -114,17 +98,13 @@ void bootstrap() {
                 multiplier = 10;
             }
             if (symbol == SDLK_UP) {
-                stft_spectrogram->shift_view(15 * multiplier);
-                perception_spectrogram->shift_view(15 * multiplier);
+                spectrogram->shift_view(15 * multiplier);
             } else if (symbol == SDLK_DOWN) {
-                stft_spectrogram->shift_view(-15 * multiplier);
-                perception_spectrogram->shift_view(-15 * multiplier);
+                spectrogram->shift_view(-15 * multiplier);
             } else if (symbol == SDLK_RIGHTBRACKET) {
-                stft_spectrogram->scale_color_gain(0.5 * multiplier);
-                perception_spectrogram->scale_color_gain(0.5 * multiplier);
+                spectrogram->scale_color_gain(0.5 * multiplier);
             } else if (symbol == SDLK_LEFTBRACKET) {
-                stft_spectrogram->scale_color_gain(-0.5 * multiplier);
-                perception_spectrogram->scale_color_gain(-0.5 * multiplier);
+                spectrogram->scale_color_gain(-0.5 * multiplier);
             } else if (symbol == SDLK_SPACE) {
                 render_toggle = !render_toggle;
             }

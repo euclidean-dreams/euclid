@@ -18,6 +18,13 @@ public:
             : width{width},
               height{height},
               signals{} {
+        while (signals.size() < width) {
+            auto dummy_signal = mkup<Signal<float>>();
+            while (dummy_signal->size() < height) {
+                dummy_signal->push_back(0);
+            }
+            signals.push_back(mv(dummy_signal));
+        }
     }
 
     void process(sp<Signal<float>> signal) {
