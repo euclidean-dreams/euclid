@@ -4,55 +4,63 @@
 
 namespace PROJECT_NAMESPACE {
 
-class Lumion : public Entity {
-private:
+
+class Luon : public Name {
+public:
+    float current_energy = 0;
+    float previous_energy = 0;
     int fundamental;
 
-public:
-    Lumion(int fundamental_frequency) :
-            fundamental{fundamental_frequency} {
-
+    Luon(int fundamental) :
+            fundamental{fundamental} {
     }
 
-    float perceive(sp<Signal<float>> &signal) {
-        float result = 0;
-
-//        // perceive only fundamental
-//        result += signal->get_sample(fundamental);
-
-        // perceive all upper partials
-        // needs more research, appears to highlight birdsong?
-        auto cur_partial = fundamental;
-        while (cur_partial < signal->size()) {
-            result -= signal->get_sample(cur_partial);
-            cur_partial += fundamental;
-        }
-        result = -result;
-
-        return result;
+    void excite(sp<Signal<float>> &signal) {
+        previous_energy = current_energy;
+        current_energy = signal->get_sample(fundamental);
     }
 };
 
-class Psyche : public Entity {
-    int LOWEST_FUNDAMENTAL = 2;
-    lst<Lumion> lumions;
+
+class Harmony : public Name {
+private:
+    lst<Luon> luons;
 
 public:
-    Psyche(int lumion_count) : lumions{} {
-        for (int fundamental = LOWEST_FUNDAMENTAL; fundamental < lumion_count; fundamental++) {
-            lumions.emplace_back(fundamental);
+    Harmony(vec<int> &signal_indices) : luons{} {
+        for (auto index: signal_indices) {
+            luons.emplace_back(index);
         }
     }
 
-    sp<Signal<float>> perceive(sp<Signal<float>> &signal) {
+    float perceive(sp<Signal<float>> &signal) {
+        float energy = 0;
+        for (auto &luon: luons) {
+            luon.excite(signal);
+            energy += luon.current_energy;
+        }
+        return energy;
+    }
+};
+
+
+class Psyche : public Name {
+private:
+    sp<lst<Luon>> luons;
+
+public:
+    Psyche(int luon_count) {
+        luons = mksp<lst<Luon>>();
+        for (int fundamental = 0; fundamental < luon_count; fundamental++) {
+            luons->emplace_back(fundamental);
+        }
+    }
+
+    void perceive(sp<Signal<float>> &signal) {
         auto result = mksp<Signal<float>>();
-        for (int fundamental = 0; fundamental < LOWEST_FUNDAMENTAL; fundamental++) {
-            result->push_back(0);
+        for (auto &luon: *luons) {
+            luon.excite(signal);
         }
-        for (auto &lumion: lumions) {
-            result->push_back(lumion.perceive(signal));
-        }
-        return result;
     }
 };
 

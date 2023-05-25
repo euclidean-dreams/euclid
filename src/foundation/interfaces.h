@@ -6,17 +6,17 @@
 
 namespace PROJECT_NAMESPACE {
 
-class Entity {
+class Name {
 public:
-    Entity(const Entity &) = delete;
+    Name(const Name &) = delete;
 
-    Entity &operator=(const Entity &) = delete;
+    Name &operator=(const Name &) = delete;
 
 protected:
-    Entity() = default;
+    Name() = default;
 };
 
-class Circlet : public Entity {
+class Circlet : public Name {
 public:
     virtual ~Circlet() = default;
 

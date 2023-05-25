@@ -4,7 +4,7 @@
 
 namespace PROJECT_NAMESPACE {
 
-class RingBuffer : public Entity {
+class RingBuffer : public Name {
 private:
     std::mutex mutex{};
     std::condition_variable signal_added_expectant{};

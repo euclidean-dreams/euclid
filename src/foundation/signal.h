@@ -6,7 +6,7 @@
 namespace PROJECT_NAMESPACE {
 
 template<class T>
-class Signal : public Entity {
+class Signal : public Name {
 private:
     vec<T> samples{};
 

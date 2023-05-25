@@ -13,8 +13,8 @@ namespace PROJECT_NAMESPACE {
 int FRAME_SIZE = 256;
 
 int RENDER_TICK_INTERVAL = 2000;
-int RENDER_WIDTH = 1000;
-int RENDER_HEIGHT = 800;
+int render_width;
+int render_height;
 
 up<SDLAudioInput> audio_input;
 up<FourierTransform> fourier_transform;
@@ -68,23 +68,36 @@ void bootstrap() {
     spdlog::info("( ) Initializing euclid");
     SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO);
     euclid = mkup<Euclid>();
+
+    spdlog::info("( ) dimensions");
+#ifdef __EMSCRIPTEN__
+    render_width = EM_ASM_INT(return screen.width);
+    render_height = EM_ASM_INT(return screen.height);
+#else
+    render_width = 1400;
+    render_height = 930;
+#endif
+    spdlog::info("width {}, height: {}", render_width, render_height);
+    spdlog::info("(~) dimensions");
+
     spdlog::info("( ) ingress");
     audio_input = mkup<SDLAudioInput>(FRAME_SIZE);
     fourier_transform = mkup<FourierTransform>();
     spdlog::info("(~) ingress");
+
     spdlog::info("( ) egress");
-    spectrogram = mkup<Spectrogram>(RENDER_WIDTH, RENDER_HEIGHT);
-    opus = mkup<Opus>(RENDER_WIDTH, RENDER_HEIGHT);
+    spectrogram = mkup<Spectrogram>(render_width, render_height);
+    opus = mkup<Opus>(render_width, render_height);
     spdlog::info("(~) egress");
-    spdlog::info("(~) Initialized euclid");
 
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop(tick, 0, true);
+    spdlog::info("(~) Initialized euclid");
 #else
     auto thread = Circlet::begin(mv(euclid));
-
     SDL_Event event;
     bool running = true;
+    spdlog::info("(~) Initialized euclid");
     while (running) {
         SDL_WaitEvent(&event);
         if (event.type == SDL_QUIT) {

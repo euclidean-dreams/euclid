@@ -5,7 +5,7 @@
 
 namespace PROJECT_NAMESPACE {
 
-class Spectrogram : public Entity {
+class Spectrogram : public Name {
 private:
     int width;
     int height;
