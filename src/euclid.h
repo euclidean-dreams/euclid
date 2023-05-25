@@ -5,12 +5,13 @@
 #include "ingress/stft.h"
 #include "egress/opus.h"
 #include "cosmology/psyche.h"
-#include "egress/spectrogram.h"
+#include "egress/visualizers.h"
 
 namespace PROJECT_NAMESPACE {
 
 // power of 2 >= 256
 int FRAME_SIZE = 256;
+int LUON_COUNT = (32 * FRAME_SIZE) / 2 + 1;
 
 int RENDER_TICK_INTERVAL = 2000;
 int render_width;
@@ -18,7 +19,9 @@ int render_height;
 
 up<SDLAudioInput> audio_input;
 up<FourierTransform> fourier_transform;
+sp<Psyche> psyche;
 up<Spectrogram> spectrogram;
+up<LuonSpiral> luon_spiral;
 up<Opus> opus;
 
 uint64_t last_render_time = 0;
@@ -38,7 +41,8 @@ private:
             auto magnitude = scast<float>(std::sqrt(std::pow(sample.real(), 2) + std::pow(sample.imag(), 2)));
             stft_magnitudes->push_back(magnitude);
         }
-        spectrogram->process(stft_magnitudes);
+//        spectrogram->process(stft_magnitudes);
+        psyche->perceive(stft_magnitudes);
     }
 
 public:
@@ -48,7 +52,8 @@ public:
         }
         if (get_current_time() - last_render_time > RENDER_TICK_INTERVAL) {
             last_render_time = get_current_time();
-            auto pixels = spectrogram->observe();
+//            auto pixels = spectrogram->observe();
+            auto pixels = luon_spiral->observe();
             opus->render(mv(pixels));
         }
     }
@@ -85,8 +90,13 @@ void bootstrap() {
     fourier_transform = mkup<FourierTransform>();
     spdlog::info("(~) ingress");
 
+    spdlog::info("( ) cosmology");
+    psyche = mksp<Psyche>(LUON_COUNT);
+    spdlog::info("(~) cosmology");
+
     spdlog::info("( ) egress");
     spectrogram = mkup<Spectrogram>(render_width, render_height);
+    luon_spiral = mkup<LuonSpiral>(psyche);
     opus = mkup<Opus>(render_width, render_height);
     spdlog::info("(~) egress");
 

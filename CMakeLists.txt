@@ -29,7 +29,7 @@ set(
         src/ingress/ring_buffer.h
         src/ingress/stft.h
 
-        src/egress/spectrogram.h
+        src/egress/visualizers.h
         src/cosmology/psyche.h
 )
 add_executable(euclid ${SOURCE_FILES})

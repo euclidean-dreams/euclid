@@ -45,10 +45,9 @@ public:
 
 
 class Psyche : public Name {
-private:
+public:
     sp<lst<Luon>> luons;
 
-public:
     Psyche(int luon_count) {
         luons = mksp<lst<Luon>>();
         for (int fundamental = 0; fundamental < luon_count; fundamental++) {

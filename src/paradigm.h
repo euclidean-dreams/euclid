@@ -37,5 +37,7 @@
 namespace PROJECT_NAMESPACE {
 
 extern int FRAME_SIZE;
+extern int render_width;
+extern int render_height;
 
 }

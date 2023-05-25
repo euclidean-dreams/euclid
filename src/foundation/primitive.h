@@ -30,8 +30,13 @@ struct Pixel {
     }
 
     static int trim(int value) {
-        if (value > 255) value = 255;
-        if (value < 0) value = 0;
+        trim(value, 0, 255);
+        return value;
+    }
+
+    static int trim(int value, int lower_bound, int upper_bound) {
+        if (value > upper_bound) value = upper_bound;
+        if (value < lower_bound) value = lower_bound;
         return value;
     }
 };
