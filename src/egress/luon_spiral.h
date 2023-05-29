@@ -10,31 +10,23 @@ private:
     int width;
     int height;
     sp<Psyche> psyche;
-    vec<int> x_values;
-    vec<int> y_values;
+    vec<Point> luon_positions;
 
 public:
     LuonSpiral(int width, int height, sp<Psyche> psyche)
             : width{width},
               height{height},
               psyche{psyche} {
-        auto index = 0;
         for (auto &luon: *psyche->luons) {
-            // location - spiral function
-            cmplx radius(0.3, 0);
-            if (index > psyche->luons->size() / 4) {
-                radius = {0.1, 0};
-            }
-            cmplx spacing(0.0001, 0);
-            cmplx t(index, 0);
-            const cmplx i(0, 1);
-            auto point = radius * t * exp(-2 * M_PI * i * pow(t, 2) * spacing);
-            int x = scast<float>(point.real()) + scast<float>(width) / 2;
-            int y = scast<float>(point.imag()) + scast<float>(height) / 2;
+            auto luon_count = psyche->luons->size();
+            float theta = luon.fundamental;
+            float radius = cos(123.0 * luon.fundamental / luon_count + M_PI) * width;
+            auto point = Point::from_polar(radius, theta);
 
-            x_values.push_back(x);
-            y_values.push_back(y);
-            index++;
+            // shift to center of screen
+            point.x += width / 2;
+            point.y += height / 2;
+            luon_positions.push_back(point);
         }
     }
 
@@ -52,11 +44,13 @@ public:
 
             // scale
             int scale = luon.current_energy;
-            int initial_x = x_values[index];
-            int initial_y = y_values[index];
-            for (int x = initial_x; x < initial_x + scale && x < width; x++) {
-                for (int y = initial_y; y < initial_y + scale && y < height; y++) {
-                    signal->set_sample(x + y * width, Pixel{red, green, blue});
+            auto initial = luon_positions[index];
+            for (int x = initial.x; x < initial.x + scale; x++) {
+                for (int y = initial.y; y < initial.y + scale; y++) {
+                    auto signal_index = x + y * width;
+                    if (signal_index < signal->size()) {
+                        signal->set_sample(signal_index, Pixel{red, green, blue});
+                    }
                 }
             }
             index++;

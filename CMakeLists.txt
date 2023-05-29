@@ -31,7 +31,7 @@ set(
 
         src/egress/luon_spiral.h
         src/cosmology/psyche.h
-        src/egress/spectrogram.h src/ingress/equalizer.h)
+        src/egress/spectrogram.h src/ingress/equalizer.h src/foundation/math.h)
 add_executable(euclid ${SOURCE_FILES})
 target_include_directories(euclid PRIVATE src)
 
