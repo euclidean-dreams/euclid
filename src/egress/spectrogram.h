@@ -62,12 +62,15 @@ public:
                 }
                 if (magnitude < 0) magnitude = 0;
                 auto red = Pixel::trim(magnitude);
-                auto green = Pixel::trim(magnitude * 3) / 3;
-                auto blue = Pixel::trim(magnitude * 8) / 3;
+                auto green = Pixel::trim(magnitude * 3 / 3);
+                auto blue = Pixel::trim(magnitude * 8 / 3);
 
                 auto index = x + y * width;
                 if (index < signal->size()) {
-                    signal->set_sample(x + y * width, Pixel{red, green, blue});
+                    auto signal_index = x + y * width;
+                    if (signal_index < signal->size()) {
+                        signal->set_sample(signal_index, Pixel{red, green, blue});
+                    }
                 }
             }
             cur_signal++;

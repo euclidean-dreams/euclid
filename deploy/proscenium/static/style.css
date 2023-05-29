@@ -13,9 +13,3 @@ body {
 .background {
     background-color: #000000;
 }
-
-#title {
-    position: fixed;
-    top: 0;
-    left: 0;
-}

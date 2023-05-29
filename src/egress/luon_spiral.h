@@ -38,9 +38,9 @@ public:
         for (auto &luon: *psyche->luons) {
             // color - luon energy
             auto color_magnitude = luon.current_energy;
-            auto red = 255 - Pixel::trim(color_magnitude - 70);
-            auto green = 255 - Pixel::trim(color_magnitude - 20);
-            auto blue = 255 - Pixel::trim(color_magnitude);
+            auto red = Pixel::trim(color_magnitude / 33);
+            auto green = Pixel::trim(color_magnitude / 3);
+            auto blue = Pixel::trim(color_magnitude * 33);
 
             // scale
             int scale = luon.current_energy;
