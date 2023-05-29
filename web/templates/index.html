@@ -5,16 +5,25 @@
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>euclid</title>
-    <link rel="stylesheet" type="text/css" href="static/style.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="static/style.css" media="screen"/>
     <link rel="icon" type="image/x-icon" href="static/favicon.ico">
 
 </head>
 
 <body>
+<div id="overlay" onclick="disappear(this)">
+    <span id="title">
+        Click to Begin.
+    </span>
+</div>
 
 <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
 
 <script type='text/javascript'>
+    function disappear(element) {
+        element.remove();
+    }
+
     var Module = {
         canvas: (function () {
             var canvas = document.getElementById('canvas');

@@ -2,7 +2,7 @@ html {
     margin: 0;
     padding: 0;
     font-family: sans-serif;
-    text-align: right;
+    text-align: center;
 }
 
 body {
@@ -11,5 +11,26 @@ body {
 }
 
 .background {
-    background-color: #000000;
+    background-color: black;
+}
+
+#overlay {
+    background-color: black;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+#title {
+    position: fixed;
+    font-style: italic;
+    font-size: 2vw;
+    color: #00E9D5;
+    text-shadow: 1px 1px 1px #006459;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
 }
