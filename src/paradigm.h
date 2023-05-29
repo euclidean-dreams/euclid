@@ -40,4 +40,7 @@ extern int FRAME_SIZE;
 extern int render_width;
 extern int render_height;
 
+SDL_Window *window;
+SDL_Renderer *renderer;
+
 }

@@ -31,7 +31,7 @@ set(
 
         src/egress/visualizers.h
         src/cosmology/psyche.h
-)
+        src/egress/spectrogram.h)
 add_executable(euclid ${SOURCE_FILES})
 target_include_directories(euclid PRIVATE src)
 

@@ -6,6 +6,7 @@
 #include "egress/opus.h"
 #include "cosmology/psyche.h"
 #include "egress/visualizers.h"
+#include "egress/spectrogram.h"
 
 namespace PROJECT_NAMESPACE {
 
@@ -41,7 +42,7 @@ private:
             auto magnitude = scast<float>(std::sqrt(std::pow(sample.real(), 2) + std::pow(sample.imag(), 2)));
             stft_magnitudes->push_back(magnitude);
         }
-//        spectrogram->process(stft_magnitudes);
+        spectrogram->process(stft_magnitudes);
         psyche->perceive(stft_magnitudes);
     }
 
@@ -52,9 +53,14 @@ public:
         }
         if (get_current_time() - last_render_time > RENDER_TICK_INTERVAL) {
             last_render_time = get_current_time();
-//            auto pixels = spectrogram->observe();
-            auto pixels = luon_spiral->observe();
-            opus->render(mv(pixels));
+            auto spectrogram_texture = spectrogram->observe();
+//            auto pixels = luon_spiral->observe();
+            SDL_Rect destination;
+            destination.x = 0;
+            destination.y = 0;
+            destination.w = render_width;
+            destination.h = render_height;
+            opus->render(spectrogram_texture, destination);
         }
     }
 
@@ -71,7 +77,6 @@ void tick() {
 
 void bootstrap() {
     spdlog::info("( ) Initializing euclid");
-    SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO);
     euclid = mkup<Euclid>();
 
     spdlog::info("( ) dimensions");
@@ -82,8 +87,23 @@ void bootstrap() {
     render_width = 1400;
     render_height = 930;
 #endif
-    spdlog::info("width {}, height: {}", render_width, render_height);
+    spdlog::info("render_width {}, render_height: {}", render_width, render_height);
     spdlog::info("(~) dimensions");
+
+    spdlog::info("( ) renderer");
+    SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO);
+    SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
+    window = SDL_CreateWindow(
+            "euclid",
+            SDL_WINDOWPOS_UNDEFINED,
+            SDL_WINDOWPOS_UNDEFINED,
+            render_width,
+            render_height,
+            SDL_WINDOW_BORDERLESS
+    );
+    Uint32 rendererFlags = SDL_RENDERER_ACCELERATED;
+    renderer = SDL_CreateRenderer(window, -1, rendererFlags);
+    spdlog::info("(~) renderer");
 
     spdlog::info("( ) ingress");
     audio_input = mkup<SDLAudioInput>(FRAME_SIZE);
@@ -97,7 +117,7 @@ void bootstrap() {
     spdlog::info("( ) egress");
     spectrogram = mkup<Spectrogram>(render_width, render_height);
     luon_spiral = mkup<LuonSpiral>(psyche);
-    opus = mkup<Opus>(render_width, render_height);
+    opus = mkup<Opus>();
     spdlog::info("(~) egress");
 
 #ifdef __EMSCRIPTEN__
