@@ -6,11 +6,14 @@ namespace PROJECT_NAMESPACE {
 
 class Opus {
 public:
-    void render(SDL_Texture *texture, SDL_Rect destination) {
-        SDL_RenderClear(renderer);
+    void blit(SDL_Texture *texture, SDL_Rect destination) {
         SDL_RenderCopy(renderer, texture, nullptr, &destination);
-        SDL_RenderPresent(renderer);
         SDL_DestroyTexture(texture);
+    }
+
+    void render() {
+        SDL_RenderPresent(renderer);
+        SDL_RenderClear(renderer);
     }
 };
 

@@ -29,9 +29,9 @@ set(
         src/ingress/ring_buffer.h
         src/ingress/stft.h
 
-        src/egress/visualizers.h
+        src/egress/luon_spiral.h
         src/cosmology/psyche.h
-        src/egress/spectrogram.h)
+        src/egress/spectrogram.h src/ingress/equalizer.h)
 add_executable(euclid ${SOURCE_FILES})
 target_include_directories(euclid PRIVATE src)
 

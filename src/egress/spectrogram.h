@@ -10,7 +10,6 @@ private:
     int height;
     lst<sp<Signal<float>>> signals;
     int view_index = 0;
-    float color_gain = 1.2;
 
 public:
     Spectrogram(int width, int height)
@@ -40,11 +39,6 @@ public:
         if (view_index < 0) view_index = 0;
     }
 
-    void scale_color_gain(float delta) {
-        color_gain += delta;
-        if (color_gain < 0) color_gain = 0;
-    }
-
     SDL_Texture *observe() {
         auto signal = mkup<Signal<Pixel>>();
         signal->populate(width * height, Pixel{0, 0, 0});
@@ -63,7 +57,7 @@ public:
                 if (cur_value == cur_value_end) {
                     magnitude = 100;
                 } else {
-                    magnitude = scast<int>(*cur_value) * color_gain;
+                    magnitude = scast<int>(*cur_value);
                     cur_value++;
                 }
                 if (magnitude < 0) magnitude = 0;
