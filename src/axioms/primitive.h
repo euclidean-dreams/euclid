@@ -28,16 +28,19 @@ struct Pixel {
         color |= ((uint32_t) char_red << 16);
         color |= ((uint32_t) char_alpha << 24);
     }
+};
 
-    static int trim(int value) {
-        trim(value, 0, 255);
-        return value;
-    }
+class Point {
+public:
+    float x;
+    float y;
+    float z;
 
-    static int trim(int value, int lower_bound, int upper_bound) {
-        if (value > upper_bound) value = upper_bound;
-        if (value < lower_bound) value = lower_bound;
-        return value;
+    Point(float x, float y) :
+            x{x}, y{y}, z{0} {}
+
+    static Point from_polar(float radius, float theta) {
+        return Point{radius * cos(theta), radius * sin(theta)};
     }
 };
 

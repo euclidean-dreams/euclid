@@ -33,7 +33,6 @@ set(
         src/optics/opus.h
         src/optics/spectrogram.h
 
-        src/optics/luon_spiral.h
         src/cosmology/psyche.h
 )
 add_executable(euclid ${SOURCE_FILES})

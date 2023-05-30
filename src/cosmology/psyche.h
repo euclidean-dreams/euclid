@@ -7,8 +7,10 @@ namespace PROJECT_NAMESPACE {
 
 class Luon : public Name {
 public:
-    float current_energy = 0;
-    float previous_energy = 0;
+    float energy = 0;
+    float prior_energy = 0;
+    float delta = 0;
+    float prior_delta = 0;
     int fundamental;
 
     Luon(int fundamental) :
@@ -16,8 +18,11 @@ public:
     }
 
     void excite(sp<Signal<float>> &signal) {
-        previous_energy = current_energy;
-        current_energy = signal->get_sample(fundamental);
+        prior_energy = energy;
+        energy = signal->get_sample(fundamental);
+
+        prior_delta = delta;
+        delta = energy - prior_energy;
     }
 };
 
@@ -37,7 +42,7 @@ public:
         float energy = 0;
         for (auto &luon: luons) {
             luon.excite(signal);
-            energy += luon.current_energy;
+            energy += luon.energy;
         }
         return energy;
     }
@@ -47,6 +52,8 @@ public:
 class Psyche : public Name {
 public:
     sp<lst<Luon>> luons;
+    float average_energy;
+
 
     Psyche(int luon_count) {
         luons = mksp<lst<Luon>>();
