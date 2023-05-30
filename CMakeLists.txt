@@ -17,21 +17,25 @@ set(
         SOURCE_FILES
         src/main.cpp
         src/euclid.h
-        src/egress/opus.h
         src/paradigm.h
         src/foundation.h
 
-        src/foundation/interfaces.h
-        src/foundation/primitive.h
-        src/foundation/time.h
+        src/axioms/interfaces.h
+        src/axioms/primitive.h
+        src/axioms/time.h
+        src/axioms/math.h
 
-        src/ingress/audio_input.h
-        src/ingress/ring_buffer.h
-        src/ingress/stft.h
+        src/acoustics/audio_input.h
+        src/acoustics/equalizer.h
+        src/acoustics/ring_buffer.h
+        src/acoustics/stft.h
 
-        src/egress/luon_spiral.h
+        src/optics/opus.h
+        src/optics/spectrogram.h
+
+        src/optics/luon_spiral.h
         src/cosmology/psyche.h
-        src/egress/spectrogram.h src/ingress/equalizer.h src/foundation/math.h)
+)
 add_executable(euclid ${SOURCE_FILES})
 target_include_directories(euclid PRIVATE src)
 

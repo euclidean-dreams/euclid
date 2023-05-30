@@ -1,13 +1,13 @@
 #pragma once
 
 #include "foundation.h"
-#include "ingress/audio_input.h"
-#include "ingress/stft.h"
-#include "egress/opus.h"
+#include "acoustics/audio_input.h"
+#include "acoustics/stft.h"
+#include "optics/opus.h"
 #include "cosmology/psyche.h"
-#include "egress/luon_spiral.h"
-#include "egress/spectrogram.h"
-#include "ingress/equalizer.h"
+#include "optics/luon_spiral.h"
+#include "optics/spectrogram.h"
+#include "acoustics/equalizer.h"
 
 namespace PROJECT_NAMESPACE {
 
@@ -119,23 +119,23 @@ void bootstrap() {
     renderer = SDL_CreateRenderer(window, -1, rendererFlags);
     spdlog::info("(~) renderer");
 
-    spdlog::info("( ) ingress");
+    spdlog::info("( ) acoustics");
     audio_input = mkup<SDLAudioInput>(FRAME_SIZE);
     equalizer = mkup<Equalizer>();
     fourier_transform = mkup<FourierTransform>();
-    spdlog::info("(~) ingress");
+    spdlog::info("(~) acoustics");
 
     spdlog::info("( ) cosmology");
     psyche = mksp<Psyche>(LUON_COUNT);
     spdlog::info("(~) cosmology");
 
-    spdlog::info("( ) egress");
+    spdlog::info("( ) optics");
     auto widths = render_width / 2;
     auto heights = render_height;
     spectrogram = mkup<Spectrogram>(widths, heights);
     luon_spiral = mkup<LuonSpiral>(widths, heights, psyche);
     opus = mkup<Opus>();
-    spdlog::info("(~) egress");
+    spdlog::info("(~) optics");
 
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop(tick, 0, true);
