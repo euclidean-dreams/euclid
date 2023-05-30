@@ -18,7 +18,7 @@ set(
         src/main.cpp
         src/euclid.h
         src/paradigm.h
-        src/foundation.h
+        src/axioms.h
 
         src/axioms/interfaces.h
         src/axioms/primitive.h

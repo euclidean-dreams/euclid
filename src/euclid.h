@@ -1,6 +1,6 @@
 #pragma once
 
-#include "foundation.h"
+#include "axioms.h"
 #include "acoustics/audio_input.h"
 #include "acoustics/stft.h"
 #include "optics/opus.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "foundation.h"
+#include "axioms.h"
 #include "ring_buffer.h"
 
 namespace PROJECT_NAMESPACE {

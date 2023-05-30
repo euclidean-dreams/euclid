@@ -3,7 +3,7 @@
 #include <complex>
 #include <list>
 #include "kiss_fftr.h"
-#include "foundation.h"
+#include "axioms.h"
 
 namespace PROJECT_NAMESPACE {
 
