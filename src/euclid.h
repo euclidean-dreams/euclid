@@ -7,7 +7,7 @@
 #include "cosmology/psyche.h"
 #include "optics/spectrogram.h"
 #include "acoustics/equalizer.h"
-#include "optics/verdant.h"
+#include "optics/sunbeam.h"
 
 namespace PROJECT_NAMESPACE {
 
@@ -24,7 +24,7 @@ up<Equalizer> equalizer;
 up<FourierTransform> fourier_transform;
 sp<Psyche> psyche;
 up<Spectrogram> spectrogram;
-up<Verdant> verdant;
+up<SunBeams> sunbeams;
 up<Opus> opus;
 
 uint64_t last_render_time = 0;
@@ -73,7 +73,7 @@ public:
 //            opus->blit(luon_texture, right_half);
 
 
-            auto luon_texture = verdant->observe();
+            auto luon_texture = sunbeams->observe();
             SDL_Rect fullscreen;
             fullscreen.x = 0;
             fullscreen.y = 0;
@@ -141,7 +141,7 @@ void bootstrap() {
     auto widths = render_width / 2;
     auto heights = render_height;
     spectrogram = mkup<Spectrogram>(widths, heights);
-    verdant = mkup<Verdant>(widths, heights, psyche);
+    sunbeams = mkup<SunBeams>(widths, heights, psyche);
     opus = mkup<Opus>();
     spdlog::info("(~) optics");
 
