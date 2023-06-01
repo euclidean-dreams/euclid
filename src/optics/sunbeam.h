@@ -5,6 +5,8 @@
 
 namespace PROJECT_NAMESPACE {
 
+float EXCITATION_THRESHOLD = 3;
+
 class Canvas : public Name {
 public:
     int width;
@@ -46,11 +48,11 @@ public:
             if (luon.delta > 0) {
                 rotation += luon.delta / 333;
                 auto cur_tip = *(--body.end());
-                auto new_position = Point::from_polar(step_distance, rotation);
+                auto new_position = Point::from_polar(step_distance + luon.delta / 33, rotation);
                 body.emplace_back(cur_tip.x + new_position.x, cur_tip.y + new_position.y);
             } else {
-                if (not body.empty())
-                    body.pop_back();
+                if (body.size() > 1)
+                    body.pop_front();
             }
         }
 
@@ -66,7 +68,7 @@ private:
 
 public:
     Luon &luon;
-    Ray stalk;
+    Ray ray;
     float energy_requirement;
     int depth;
     lst<Sunbeam> branching_beams;
@@ -74,7 +76,7 @@ public:
 
     Sunbeam(Luon &luon, Point origin, float rotation, float energy_requirement, int depth) :
             luon{luon},
-            stalk(luon, origin, rotation),
+            ray(luon, origin, rotation),
             energy_requirement{energy_requirement},
             depth{depth},
             branching_beams{} {
@@ -83,21 +85,19 @@ public:
     void draw(Canvas &canvas) {
         // color - luon energy
         auto color_mag = luon.energy;
-        auto red = trim(color_mag, 0, 255);
-        auto green = trim(color_mag / 3, 0, 255);
-        auto blue = trim(color_mag / 9, 0, 255);
+        auto red = trim(color_mag * 9 + 44, 0, 255);
+        auto green = trim(color_mag * 3 + 9, 0, 233);
+        auto blue = trim(color_mag / 3, 0, 33);
 
-        stalk.paint_body(canvas, {red, green, blue});
+        ray.paint_body(canvas, {red, green, blue});
 
         // replicate
         if (depth < MAX_DEPTH) {
             // trough detected
             if (luon.prior_delta <= 0 && luon.delta > 0) {
-                auto origin = *(--stalk.body.end());
-                auto rotation = stalk.rotation + cos(age / 4) * M_PI / 2;
-                branching_beams.emplace_back(luon, origin, rotation, luon.energy, depth + 1);
+                auto origin = *(--ray.body.end());
+                branching_beams.emplace_back(luon, origin, ray.rotation + 0.3, luon.energy, depth + 1);
             }
-
         }
 
         for (auto &beam: branching_beams) {
@@ -129,7 +129,7 @@ private:
     int width;
     int height;
     sp<Psyche> psyche;
-    lst<Sunbeam> stalks;
+    lst<Sunbeam> beams;
     int age;
 
 public:
@@ -149,19 +149,22 @@ public:
         Canvas canvas{width, height, *pixels};
 
         for (auto &luon: *psyche->luons) {
-            Point origin{scast<float>(rand() % width), scast<float>(rand() % height)};
-            stalks.emplace_back(luon, origin, scast<float>(2 * M_PI * cos(age / 64)), 2, 0);
+            if (luon.energy > EXCITATION_THRESHOLD) {
+                Point origin{scast<float>(rand() % width), scast<float>(rand() % height)};
+                float direction = 2 * M_PI * cos(age / 64);
+                beams.emplace_back(luon, origin, direction, EXCITATION_THRESHOLD, 0);
+            }
         }
 
-        auto cur_stalk = stalks.begin();
-        while (cur_stalk != stalks.end()) {
+        auto cur_stalk = beams.begin();
+        while (cur_stalk != beams.end()) {
             if (not cur_stalk->live())
-                cur_stalk = stalks.erase(cur_stalk);
+                cur_stalk = beams.erase(cur_stalk);
             else
                 cur_stalk++;
         }
-        for (auto &stalk: stalks) {
-            stalk.draw(canvas);
+        for (auto &ray: beams) {
+            ray.draw(canvas);
         }
 
         ////////////////////////////////////
