@@ -82,10 +82,10 @@ public:
 
     void draw(Canvas &canvas) {
         // color - luon energy
-        auto color_mag = luon.energy * 10;
-        auto red = 255 - trim(color_mag / 33, 0, 255);
-        auto green = 255 - trim(color_mag / 3, 0, 255);
-        auto blue = 255 - trim(color_mag * 33, 0, 255);
+        auto color_mag = luon.energy;
+        auto red = trim(color_mag, 0, 255);
+        auto green = trim(color_mag / 3, 0, 255);
+        auto blue = trim(color_mag / 9, 0, 255);
 
         stalk.paint_body(canvas, {red, green, blue});
 
@@ -143,7 +143,7 @@ public:
     SDL_Texture *observe() {
         age++;
         auto pixels = mkup<Signal<Pixel>>();
-        pixels->populate(width * height, Pixel{255, 255, 255});
+        pixels->populate(width * height, Pixel{0, 0, 0});
         int pitch = scast<int>(width * sizeof(Pixel));
         //////////////////////////////////////////////////////////////
         Canvas canvas{width, height, *pixels};
