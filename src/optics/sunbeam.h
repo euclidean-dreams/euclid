@@ -39,11 +39,12 @@ public:
     }
 
     void paint_body(Canvas &canvas, Pixel color) {
-        int displacement = abs(luon.delta * 2);
+        float displacement = abs(luon.delta / 3);
         while (displacement > 0) {
-            auto step_distance = 0.5;
+            auto step_distance = 0.7;
             displacement -= step_distance;
             if (luon.delta > 0) {
+                rotation += luon.delta / 333;
                 auto cur_tip = *(--body.end());
                 auto new_position = Point::from_polar(step_distance, rotation);
                 body.emplace_back(cur_tip.x + new_position.x, cur_tip.y + new_position.y);
@@ -90,17 +91,10 @@ public:
 
         // replicate
         if (depth < MAX_DEPTH) {
-            // peak detected
-            if (luon.prior_delta >= 0 && luon.delta < 0) {
-                auto origin = *(--stalk.body.end());
-                auto rotation = sin(age / 16) * M_PI / 3;
-                branching_beams.emplace_back(luon, origin, rotation, luon.energy, depth + 1);
-            }
-
             // trough detected
             if (luon.prior_delta <= 0 && luon.delta > 0) {
                 auto origin = *(--stalk.body.end());
-                auto rotation = cos(age / 16) * M_PI / 3;
+                auto rotation = stalk.rotation + cos(age / 4) * M_PI / 2;
                 branching_beams.emplace_back(luon, origin, rotation, luon.energy, depth + 1);
             }
 
@@ -156,7 +150,7 @@ public:
 
         for (auto &luon: *psyche->luons) {
             Point origin{scast<float>(rand() % width), scast<float>(rand() % height)};
-            stalks.emplace_back(luon, origin, scast<float>(2 * M_PI * cos(age / 64)), 3, 0);
+            stalks.emplace_back(luon, origin, scast<float>(2 * M_PI * cos(age / 64)), 2, 0);
         }
 
         auto cur_stalk = stalks.begin();

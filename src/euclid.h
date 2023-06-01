@@ -106,8 +106,8 @@ void bootstrap() {
     render_width = EM_ASM_INT(return screen.width);
     render_height = EM_ASM_INT(return screen.height);
 #else
-    render_width = 1400;
-    render_height = 930;
+    render_width = 1467;
+    render_height = 956;
 #endif
     spdlog::info("render_width {}, render_height: {}", render_width, render_height);
     spdlog::info("(~) dimensions");
@@ -115,13 +115,14 @@ void bootstrap() {
     spdlog::info("( ) renderer");
     SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO);
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
+    Uint32 window_flags = SDL_WINDOW_BORDERLESS;
     window = SDL_CreateWindow(
             "euclid",
             SDL_WINDOWPOS_UNDEFINED,
             SDL_WINDOWPOS_UNDEFINED,
             render_width,
             render_height,
-            SDL_WINDOW_BORDERLESS
+            window_flags
     );
     Uint32 rendererFlags = SDL_RENDERER_ACCELERATED;
     renderer = SDL_CreateRenderer(window, -1, rendererFlags);
@@ -170,9 +171,9 @@ void bootstrap() {
             } else if (symbol == SDLK_DOWN) {
                 spectrogram->shift_view(-15 * multiplier);
             } else if (symbol == SDLK_RIGHTBRACKET) {
-                equalizer->scale_gain(0.5 * multiplier);
+                equalizer->scale_gain(0.1 * multiplier);
             } else if (symbol == SDLK_LEFTBRACKET) {
-                equalizer->scale_gain(-0.5 * multiplier);
+                equalizer->scale_gain(-0.1 * multiplier);
             } else if (symbol == SDLK_SPACE) {
                 render_toggle = !render_toggle;
             }

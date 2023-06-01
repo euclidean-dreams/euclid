@@ -52,7 +52,6 @@ public:
 class Psyche : public Name {
 public:
     sp<lst<Luon>> luons;
-    float average_energy;
 
 
     Psyche(int luon_count) {
