@@ -106,7 +106,7 @@ void bootstrap() {
     render_width = EM_ASM_INT(return screen.width);
     render_height = EM_ASM_INT(return screen.height);
 #else
-    render_width = 1468;
+    render_width = 1470;
     render_height = 956;
 #endif
     spdlog::info("render_width {}, render_height: {}", render_width, render_height);
