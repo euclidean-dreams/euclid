@@ -5,8 +5,6 @@
 
 namespace PROJECT_NAMESPACE {
 
-float EXCITATION_THRESHOLD = 3;
-
 class Canvas : public Name {
 public:
     int width;
@@ -152,7 +150,7 @@ private:
     int width;
     int height;
     sp<Psyche> psyche;
-    lst<Sunbeam> beams;
+    lst<Sunbeam> entities;
     int age;
 
 public:
@@ -167,20 +165,21 @@ public:
         age++;
         Canvas canvas{width, height};
         for (auto &luon: *psyche->luons) {
-            if (luon.energy > EXCITATION_THRESHOLD) {
+            float excitation_threshold = 3;
+            if (luon.energy > excitation_threshold) {
                 Point origin{scast<float>(rand() % width), scast<float>(rand() % height)};
                 float direction = 2 * M_PI * cos(age / 64);
-                beams.emplace_back(luon, origin, direction, EXCITATION_THRESHOLD, 0);
+                entities.emplace_back(luon, origin, direction, excitation_threshold, 0);
             }
         }
-        auto cur_stalk = beams.begin();
-        while (cur_stalk != beams.end()) {
+        auto cur_stalk = entities.begin();
+        while (cur_stalk != entities.end()) {
             if (not cur_stalk->live())
-                cur_stalk = beams.erase(cur_stalk);
+                cur_stalk = entities.erase(cur_stalk);
             else
                 cur_stalk++;
         }
-        for (auto &ray: beams) {
+        for (auto &ray: entities) {
             ray.draw(canvas);
         }
         return canvas.finalize();
