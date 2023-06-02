@@ -5,7 +5,6 @@
 #include "acoustics/stft.h"
 #include "optics/opus.h"
 #include "cosmology/psyche.h"
-#include "optics/spectrogram.h"
 #include "acoustics/equalizer.h"
 #include "optics/brushwork.h"
 
@@ -23,8 +22,7 @@ up<SDLAudioInput> audio_input;
 up<Equalizer> equalizer;
 up<FourierTransform> fourier_transform;
 sp<Psyche> psyche;
-up<Spectrogram> spectrogram;
-up<SunBeams> sunbeams;
+up<Brushwork> brushwork;
 up<Opus> opus;
 
 uint64_t last_render_time = 0;
@@ -45,7 +43,6 @@ private:
             auto magnitude = scast<float>(std::sqrt(std::pow(sample.real(), 2) + std::pow(sample.imag(), 2)));
             stft_magnitudes->push_back(magnitude);
         }
-//        spectrogram->process(stft_magnitudes);
         psyche->perceive(stft_magnitudes);
     }
 
@@ -56,25 +53,13 @@ public:
         }
         if (get_current_time() - last_render_time > RENDER_TICK_INTERVAL) {
             last_render_time = get_current_time();
-//            auto spectrogram_texture = spectrogram->observe();
-//            SDL_Rect left_half;
-//            left_half.x = 0;
-//            left_half.y = 0;
-//            left_half.w = render_width / 2;
-//            left_half.h = render_height;
-//            opus->blit(spectrogram_texture, left_half);
-//
-//            auto luon_texture = verdant->observe();
-//            SDL_Rect right_half;
-//            right_half.x = render_width / 2;
-//            right_half.y = 0;
-//            right_half.w = render_width / 2;
-//            right_half.h = render_height;
-//            opus->blit(luon_texture, right_half);
-
-
-            auto luon_texture = sunbeams->observe();
-            SDL_Rect fullscreen;
+            auto luon_texture = brushwork->observe();
+            SDL_Rect fullscreen{
+                    0,
+                    0,
+                    render_width,
+                    render_height
+            };
             fullscreen.x = 0;
             fullscreen.y = 0;
             fullscreen.w = render_width;
@@ -139,10 +124,7 @@ void bootstrap() {
     spdlog::info("(~) cosmology");
 
     spdlog::info("( ) optics");
-    auto widths = render_width / 2;
-    auto heights = render_height;
-    spectrogram = mkup<Spectrogram>(widths, heights);
-    sunbeams = mkup<SunBeams>(widths, heights, psyche);
+    brushwork = mkup<Brushwork>(render_width, render_height, psyche);
     opus = mkup<Opus>();
     spdlog::info("(~) optics");
 
@@ -166,11 +148,7 @@ void bootstrap() {
             if (shift_held_down) {
                 multiplier = 10;
             }
-            if (symbol == SDLK_UP) {
-                spectrogram->shift_view(15 * multiplier);
-            } else if (symbol == SDLK_DOWN) {
-                spectrogram->shift_view(-15 * multiplier);
-            } else if (symbol == SDLK_RIGHTBRACKET) {
+            if (symbol == SDLK_RIGHTBRACKET) {
                 equalizer->scale_gain(0.1 * multiplier);
             } else if (symbol == SDLK_LEFTBRACKET) {
                 equalizer->scale_gain(-0.1 * multiplier);

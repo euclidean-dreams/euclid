@@ -44,7 +44,7 @@ public:
         }
     }
 
-    SDL_Texture *render() {
+    SDL_Texture *finalize() {
         SDL_UnlockTexture(texture);
         return texture;
     }
@@ -147,7 +147,7 @@ public:
     }
 };
 
-class SunBeams : public Name {
+class Brushwork : public Name {
 private:
     int width;
     int height;
@@ -156,10 +156,10 @@ private:
     int age;
 
 public:
-    SunBeams(int width, int height, sp<Psyche> psyche)
+    Brushwork(int width, int height, sp<Psyche> psyche)
             : width{width},
               height{height},
-              psyche{psyche} {
+              psyche{mv(psyche)} {
 
     }
 
@@ -183,7 +183,7 @@ public:
         for (auto &ray: beams) {
             ray.draw(canvas);
         }
-        return canvas.render();
+        return canvas.finalize();
     }
 };
 

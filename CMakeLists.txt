@@ -31,7 +31,6 @@ set(
         src/acoustics/stft.h
 
         src/optics/opus.h
-        src/optics/spectrogram.h
 
         src/cosmology/psyche.h
 )
