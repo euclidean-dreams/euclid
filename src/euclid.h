@@ -12,6 +12,9 @@ namespace PROJECT_NAMESPACE {
 
 // power of 2 >= 256
 int FRAME_SIZE = 256;
+
+// for one luon per fft bin: LUON_COUNT = (32 * FRAME_SIZE) / 2 + 1;
+// to arbitrarily ignore super-high frequencies, use fewer
 int LUON_COUNT = (32 * FRAME_SIZE) / 2 + 1;
 
 int RENDER_TICK_INTERVAL = 2000;
@@ -124,7 +127,12 @@ void bootstrap() {
     spdlog::info("(~) cosmology");
 
     spdlog::info("( ) optics");
-    brushwork = mkup<Brushwork>(render_width, render_height, psyche);
+    vec<int> brushwork_harmony_luons{};
+    for (int i = 0; i < LUON_COUNT; i++) {
+        brushwork_harmony_luons.push_back(i);
+    }
+    auto harmony = psyche->create_harmony(brushwork_harmony_luons);
+    brushwork = mkup<Brushwork>(render_width, render_height, mv(harmony));
     opus = mkup<Opus>();
     spdlog::info("(~) optics");
 

@@ -28,44 +28,38 @@ public:
 
 
 class Harmony : public Name {
-private:
-    lst<Luon> luons;
-
 public:
-    Harmony(vec<int> &signal_indices) : luons{} {
-        for (auto index: signal_indices) {
-            luons.emplace_back(index);
-        }
-    }
+    up<vec<sp<Luon>>> luons;
 
-    float perceive(sp<Signal<float>> &signal) {
-        float energy = 0;
-        for (auto &luon: luons) {
-            luon.excite(signal);
-            energy += luon.energy;
-        }
-        return energy;
+    Harmony(up<vec<sp<Luon>>> luons) : luons{mv(luons)} {
+
     }
 };
 
 
 class Psyche : public Name {
+private:
+    vec<sp<Luon>> luons;
+
 public:
-    sp<lst<Luon>> luons;
-
-
-    Psyche(int luon_count) {
-        luons = mksp<lst<Luon>>();
+    Psyche(int luon_count) : luons{} {
         for (int fundamental = 0; fundamental < luon_count; fundamental++) {
-            luons->emplace_back(fundamental);
+            luons.push_back(mksp<Luon>(fundamental));
         }
     }
 
     void perceive(sp<Signal<float>> &signal) {
-        auto result = mksp<Signal<float>>();
-        for (auto &luon: *luons) {
-            luon.excite(signal);
+        for (auto &luon: luons) {
+            luon->excite(signal);
         }
+    }
+
+    up<Harmony> create_harmony(vec<int> &signal_indices) {
+        auto luons_in_harmony = mkup<vec<sp<Luon>>>();
+        for (auto index: signal_indices) {
+            luons_in_harmony->push_back(luons[index]);
+        }
+        return mkup<Harmony>(mv(luons_in_harmony));
     }
 };
 

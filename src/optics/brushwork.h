@@ -9,18 +9,15 @@ class Canvas : public Name {
 public:
     int width;
     int height;
-    Signal<Pixel> pixels_dep;
     SDL_Texture *texture;
     Pixel *pixels;
 
     Canvas(int width, int height) :
             width{width},
             height{height},
-            pixels_dep{},
             texture{},
             pixels{} {
 
-        pixels_dep.populate(width * height, Pixel{0, 0, 0});
         texture = SDL_CreateTexture(
                 renderer,
                 SDL_PIXELFORMAT_ARGB8888,
@@ -29,9 +26,12 @@ public:
                 height
         );
         auto pitch = scast<int>(width * sizeof(Pixel));
-        void * pixel_buffer;
+        void *pixel_buffer;
         SDL_LockTexture(texture, nullptr, &pixel_buffer, &pitch);
         pixels = scast<Pixel *>(pixel_buffer);
+        for (int i = 0; i < width * height; i++) {
+            pixels[i] = {0, 0, 0};
+        }
     }
 
     void paint(Point point, Pixel color) {
@@ -48,81 +48,59 @@ public:
     }
 };
 
-class Ray : public Name {
+class Brush : public Name {
 public:
     Luon &luon;
+    Point origin;
     float rotation;
-    lst<Point> body;
 
-    Ray(Luon &luon, Point origin, float rotation) :
+    Brush(Luon &luon, Point origin, float rotation) :
             luon{luon},
-            rotation{rotation},
-            body{} {
-        body.push_back(origin);
+            origin{origin},
+            rotation{rotation} {
     }
 
-    void paint_body(Canvas &canvas, Pixel color) {
-        float displacement = abs(luon.delta / 3);
-        while (displacement > 0) {
-            auto step_distance = 0.7;
-            displacement -= step_distance;
-            if (luon.delta > 0) {
-                rotation += luon.delta / 333;
-                auto cur_tip = *(--body.end());
-                auto new_position = Point::from_polar(step_distance + luon.delta / 33, rotation);
-                body.emplace_back(cur_tip.x + new_position.x, cur_tip.y + new_position.y);
-            } else {
-                if (body.size() > 1)
-                    body.pop_front();
-            }
+    void paint(Canvas &canvas) {
+        auto magnitude = luon.energy;
+        int red = trim(magnitude / 3, 0, 255);
+        int green = trim(magnitude / 10, 0, 255);
+        int blue = trim(magnitude, 0, 255);
+        auto scale = magnitude;
+        if (scale > canvas.width / 100) {
+            scale = canvas.width / 100;
         }
-
-        for (auto &point: body) {
-            canvas.paint(point, color);
+        for (int x_disp = 0; x_disp < scale; x_disp++) {
+            for (int y_disp = 0; y_disp < scale; y_disp++) {
+                float x = x_disp + origin.x;
+                float y = y_disp + origin.y;
+                canvas.paint({x, y}, {red, green, blue});
+            }
         }
     }
 };
 
-class Sunbeam : public Name {
+class Entity : public Name {
 private:
     int MAX_DEPTH = 1;
 
 public:
     Luon &luon;
-    Ray ray;
     float energy_requirement;
     int depth;
-    lst<Sunbeam> branching_beams;
+    lst<Brush> brushes;
     int age = 0;
 
-    Sunbeam(Luon &luon, Point origin, float rotation, float energy_requirement, int depth) :
+    Entity(Luon &luon, Point origin, float rotation, float energy_requirement, int depth) :
             luon{luon},
-            ray{luon, origin, rotation},
             energy_requirement{energy_requirement},
             depth{depth},
-            branching_beams{} {
+            brushes{} {
+        brushes.emplace_back(luon, origin, rotation);
     }
 
-    void draw(Canvas &canvas) {
-        // color - luon energy
-        auto color_mag = luon.energy;
-        auto red = trim(color_mag * 9 + 44, 0, 255);
-        auto green = trim(color_mag * 3 + 9, 0, 233);
-        auto blue = trim(color_mag / 3, 0, 33);
-
-        ray.paint_body(canvas, {red, green, blue});
-
-        // replicate
-        if (depth < MAX_DEPTH) {
-            // trough detected
-            if (luon.prior_delta <= 0 && luon.delta > 0) {
-                auto origin = *(--ray.body.end());
-                branching_beams.emplace_back(luon, origin, ray.rotation + 0.3, luon.energy, depth + 1);
-            }
-        }
-
-        for (auto &beam: branching_beams) {
-            beam.draw(canvas);
+    void paint(Canvas &canvas) {
+        for (auto &brush: brushes) {
+            brush.paint(canvas);
         }
     }
 
@@ -130,57 +108,50 @@ public:
         // return true to continue being alive
         if (luon.energy < energy_requirement)
             return false;
-
-        // clean up branching beams
-        auto cur_branch = branching_beams.begin();
-        while (cur_branch != branching_beams.end()) {
-            if (not cur_branch->live())
-                cur_branch = branching_beams.erase(cur_branch);
-            else
-                cur_branch++;
-        }
-
         age += 1;
         return true;
     }
+
 };
 
 class Brushwork : public Name {
 private:
     int width;
     int height;
-    sp<Psyche> psyche;
-    lst<Sunbeam> entities;
-    int age;
+    up<Harmony> harmony;
+    lst<Entity> entities;
+    int age = 0;
 
 public:
-    Brushwork(int width, int height, sp<Psyche> psyche)
+    Brushwork(int width, int height, up<Harmony> harmony)
             : width{width},
               height{height},
-              psyche{mv(psyche)} {
+              harmony{mv(harmony)} {
 
     }
 
     SDL_Texture *observe() {
         age++;
         Canvas canvas{width, height};
-        for (auto &luon: *psyche->luons) {
+        for (auto &luon: *harmony->luons) {
             float excitation_threshold = 3;
-            if (luon.energy > excitation_threshold) {
+            if (luon->energy > excitation_threshold) {
                 Point origin{scast<float>(rand() % width), scast<float>(rand() % height)};
                 float direction = 2 * M_PI * cos(age / 64);
-                entities.emplace_back(luon, origin, direction, excitation_threshold, 0);
+                entities.emplace_back(*luon, origin, direction, excitation_threshold, 0);
             }
         }
-        auto cur_stalk = entities.begin();
-        while (cur_stalk != entities.end()) {
-            if (not cur_stalk->live())
-                cur_stalk = entities.erase(cur_stalk);
+        auto cur = entities.begin();
+        while (cur != entities.end()) {
+            if (not cur->live())
+                cur = entities.erase(cur);
             else
-                cur_stalk++;
+                cur++;
         }
-        for (auto &ray: entities) {
-            ray.draw(canvas);
+        while (entities.size() > 10000)
+            entities.pop_front();
+        for (auto &entity: entities) {
+            entity.paint(canvas);
         }
         return canvas.finalize();
     }
