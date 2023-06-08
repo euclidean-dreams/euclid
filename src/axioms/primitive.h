@@ -54,8 +54,8 @@ public:
     Point(float x, float y) :
             x{x}, y{y}, z{0} {}
 
-    static Point from_polar(float radius, float theta) {
-        return Point{radius * cos(theta), radius * sin(theta)};
+    static Point from_polar(Point origin, float radius, float theta) {
+        return Point{origin.x + radius * cos(theta), origin.y + radius * sin(theta)};
     }
 };
 

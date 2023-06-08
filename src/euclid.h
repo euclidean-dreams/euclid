@@ -6,16 +6,14 @@
 #include "optics/opus.h"
 #include "cosmology/psyche.h"
 #include "acoustics/equalizer.h"
-#include "optics/brushwork.h"
+#include "optics/sage.h"
 
 namespace PROJECT_NAMESPACE {
 
 // power of 2 >= 256
 int FRAME_SIZE = 256;
-
-// for one luon per fft bin: LUON_COUNT = (32 * FRAME_SIZE) / 2 + 1;
-// to arbitrarily ignore super-high frequencies, use fewer
-int LUON_COUNT = (32 * FRAME_SIZE) / 2 + 1;
+int STFT_SIZE = (32 * FRAME_SIZE) / 2 + 1;
+int LUON_COUNT = STFT_SIZE;
 
 int RENDER_TICK_INTERVAL = 2000;
 int render_width;
@@ -25,7 +23,7 @@ up<SDLAudioInput> audio_input;
 up<Equalizer> equalizer;
 up<FourierTransform> fourier_transform;
 sp<Psyche> psyche;
-up<Brushwork> brushwork;
+up<Aspect> aspect;
 up<Opus> opus;
 
 uint64_t last_render_time = 0;
@@ -56,7 +54,7 @@ public:
         }
         if (get_current_time() - last_render_time > RENDER_TICK_INTERVAL) {
             last_render_time = get_current_time();
-            auto luon_texture = brushwork->observe();
+            auto luon_texture = aspect->observe();
             SDL_Rect fullscreen{
                     0,
                     0,
@@ -127,12 +125,12 @@ void bootstrap() {
     spdlog::info("(~) cosmology");
 
     spdlog::info("( ) optics");
-    vec<int> brushwork_harmony_luons{};
-    for (int i = 0; i < LUON_COUNT; i++) {
-        brushwork_harmony_luons.push_back(i);
+    vec<int> harmony_indices{};
+    for (int i = 0; i < LUON_COUNT / 4; i++) {
+        harmony_indices.push_back(i);
     }
-    auto harmony = psyche->create_harmony(brushwork_harmony_luons);
-    brushwork = mkup<Brushwork>(render_width, render_height, mv(harmony));
+    auto harmony = psyche->create_harmony(harmony_indices);
+    aspect = mkup<Aspect>(render_width, render_height, mv(harmony));
     opus = mkup<Opus>();
     spdlog::info("(~) optics");
 

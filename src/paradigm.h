@@ -1,5 +1,6 @@
 #pragma once
 
+#include <complex>
 #include <vector>
 #include <list>
 #include <spdlog/spdlog.h>
@@ -29,6 +30,8 @@
 #define lst std::list
 #define umap std::unordered_map
 #define scast static_cast
+#define scint scast<float>
+#define scflt scast<float>
 #define cmplx std::complex<double>
 
 ///////////////////

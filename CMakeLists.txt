@@ -33,6 +33,7 @@ set(
         src/optics/opus.h
 
         src/cosmology/psyche.h
+        src/optics/sage.h
 )
 add_executable(euclid ${SOURCE_FILES})
 target_include_directories(euclid PRIVATE src)
