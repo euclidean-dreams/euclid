@@ -23,7 +23,7 @@ up<SDLAudioInput> audio_input;
 up<Equalizer> equalizer;
 up<FourierTransform> fourier_transform;
 sp<Psyche> psyche;
-up<Aspect> aspect;
+up<Sage> sage;
 up<Opus> opus;
 
 uint64_t last_render_time = 0;
@@ -54,7 +54,7 @@ public:
         }
         if (get_current_time() - last_render_time > RENDER_TICK_INTERVAL) {
             last_render_time = get_current_time();
-            auto luon_texture = aspect->observe();
+            auto luon_texture = sage->observe();
             SDL_Rect fullscreen{
                     0,
                     0,
@@ -130,7 +130,7 @@ void bootstrap() {
         harmony_indices.push_back(i);
     }
     auto harmony = psyche->create_harmony(harmony_indices);
-    aspect = mkup<Aspect>(render_width, render_height, mv(harmony));
+    sage = mkup<Sage>(render_width, render_height, mv(harmony));
     opus = mkup<Opus>();
     spdlog::info("(~) optics");
 
