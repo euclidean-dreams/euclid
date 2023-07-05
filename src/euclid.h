@@ -7,6 +7,7 @@
 #include "cosmology/psyche.h"
 #include "acoustics/equalizer.h"
 #include "optics/sage.h"
+#include "optics/atmosphere.h"
 
 namespace PROJECT_NAMESPACE {
 
@@ -24,6 +25,7 @@ up<Equalizer> equalizer;
 up<FourierTransform> fourier_transform;
 sp<Psyche> psyche;
 up<Sage> sage;
+up<Atmosphere> atmosphere;
 up<Opus> opus;
 
 uint64_t last_render_time = 0;
@@ -54,21 +56,14 @@ public:
         }
         if (get_current_time() - last_render_time > RENDER_TICK_INTERVAL) {
             last_render_time = get_current_time();
-            auto luon_texture = sage->observe();
-            SDL_Rect fullscreen{
-                    0,
-                    0,
-                    render_width,
-                    render_height
-            };
-            fullscreen.x = 0;
-            fullscreen.y = 0;
-            fullscreen.w = render_width;
-            fullscreen.h = render_height;
-            opus->blit(luon_texture, fullscreen);
+            SDL_Rect fullscreen{0, 0, render_width, render_height};
+            Canvas blackout{render_width, render_height};
+            blackout.paint_rect(fullscreen, {0, 0, 0, 255});
+            opus->blit(blackout.finalize(), fullscreen);
+            opus->blit(atmosphere->observe(), fullscreen);
+            opus->blit(sage->observe(), fullscreen);
 
             opus->render();
-
         }
     }
 
@@ -129,8 +124,13 @@ void bootstrap() {
     for (int i = 0; i < LUON_COUNT / 4; i++) {
         harmony_indices.push_back(i);
     }
-    auto harmony = psyche->create_harmony(harmony_indices);
-    sage = mkup<Sage>(render_width, render_height, mv(harmony));
+    sage = mkup<Sage>(render_width, render_height, psyche->create_harmony(harmony_indices));
+
+    harmony_indices.clear();
+    for (int i = 0; i < LUON_COUNT / 16; i++) {
+        harmony_indices.push_back(i);
+    }
+    atmosphere = mkup<Atmosphere>(render_width, render_height, psyche->create_harmony(harmony_indices));
     opus = mkup<Opus>();
     spdlog::info("(~) optics");
 

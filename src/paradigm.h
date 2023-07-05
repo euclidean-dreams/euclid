@@ -30,7 +30,7 @@
 #define lst std::list
 #define umap std::unordered_map
 #define scast static_cast
-#define scint scast<float>
+#define scint scast<int>
 #define scflt scast<float>
 #define cmplx std::complex<double>
 
