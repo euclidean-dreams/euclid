@@ -38,6 +38,11 @@ set(
 add_executable(euclid ${SOURCE_FILES})
 target_include_directories(euclid PRIVATE src)
 
+###############
+## cosmology ##
+###############
+add_subdirectory(lib/cosmology)
+
 ###########
 ### WASM ##
 ###########
