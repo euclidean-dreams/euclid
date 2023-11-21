@@ -1,6 +1,6 @@
 #pragma once
 
-#include "axioms.h"
+#include "paradigm.h"
 #include "acoustics/audio_input.h"
 #include "acoustics/stft.h"
 #include "optics/opus.h"
@@ -8,6 +8,7 @@
 #include "acoustics/equalizer.h"
 #include "optics/sage.h"
 #include "optics/atmosphere.h"
+#include "cosmology.h"
 
 namespace PROJECT_NAMESPACE {
 
@@ -24,6 +25,7 @@ up<SDLAudioInput> audio_input;
 up<Equalizer> equalizer;
 up<FourierTransform> fourier_transform;
 sp<Psyche> psyche;
+up<Cosmology> current_cosmology;
 up<Sage> sage;
 up<Atmosphere> atmosphere;
 up<Opus> opus;

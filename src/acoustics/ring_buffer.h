@@ -1,6 +1,6 @@
 #pragma once
 
-#include "axioms.h"
+#include "paradigm.h"
 
 namespace PROJECT_NAMESPACE {
 

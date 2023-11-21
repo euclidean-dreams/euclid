@@ -18,12 +18,6 @@ set(
         src/main.cpp
         src/euclid.h
         src/paradigm.h
-        src/axioms.h
-
-        src/axioms/interfaces.h
-        src/axioms/primitive.h
-        src/axioms/time.h
-        src/axioms/math.h
 
         src/acoustics/audio_input.h
         src/acoustics/equalizer.h
@@ -42,6 +36,7 @@ target_include_directories(euclid PRIVATE src)
 ## cosmology ##
 ###############
 add_subdirectory(lib/cosmology)
+target_link_libraries(euclid PRIVATE cosmology)
 
 ###########
 ### WASM ##
@@ -71,12 +66,17 @@ endif ()
 ############
 ## Spdlog ##
 ############
-integrate_cmake_dependency(
-        NAME spdlog
-        GIT_URL https://github.com/gabime/spdlog.git
-        GIT_TAG v1.11.0
-)
-target_link_libraries(euclid PRIVATE spdlog::spdlog)
+if (EMSCRIPTEN)
+    integrate_cmake_dependency(
+            NAME spdlog
+            GIT_URL https://github.com/gabime/spdlog.git
+            GIT_TAG v1.11.0
+    )
+    target_link_libraries(euclid PRIVATE spdlog::spdlog)
+else ()
+    find_package(spdlog REQUIRED)
+    target_link_libraries(cosmology PRIVATE spdlog::spdlog_header_only)
+endif ()
 
 
 #########
