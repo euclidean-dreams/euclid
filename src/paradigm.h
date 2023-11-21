@@ -1,8 +1,5 @@
 #pragma once
 
-#include <complex>
-#include <vector>
-#include <list>
 #include <spdlog/spdlog.h>
 #include "axioms.h"
 

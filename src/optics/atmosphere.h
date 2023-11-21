@@ -29,7 +29,7 @@ public:
         origin.y = cyclic_embind(0, origin.y, canvas.height);
         area_to_paint.w = embind(0, luon.energy / 2, 333);
         area_to_paint.h = embind(0, luon.energy / 2, 333);
-        canvas.paint_rect(area_to_paint, {255, 255, 255, alpha});
+        canvas.paint_rect(area_to_paint, {255, 255, 255});
     }
 
 };
@@ -55,7 +55,7 @@ public:
 
     SDL_Texture *observe() {
         Canvas canvas{width, height};
-        canvas.paint_rect(canvas.area, {255, 255, 255, 255});
+        canvas.paint_rect(canvas.area, {255, 255, 255});
         for (auto &cloud: clouds) {
             cloud.observe(canvas);
         }

@@ -32,7 +32,8 @@ public:
             area_to_paint.y = origin.y;
             area_to_paint.w = embind(0, luon.energy / 2 - i * 33, 333);
             area_to_paint.h = embind(0, luon.energy / 2 - i * 33, 333);
-            canvas.paint_rect(area_to_paint, {red, green, blue, alpha});
+            canvas.paint_rect(area_to_paint,
+                              {static_cast<uint8_t>(red), static_cast<uint8_t>(green), static_cast<uint8_t>(blue)});
         }
     }
 };
@@ -68,7 +69,8 @@ public:
                 area_to_paint.y = y - scale / 2;
                 area_to_paint.w = scale;
                 area_to_paint.h = scale;
-                canvas.paint_rect(area_to_paint, {red, green, blue, alpha});
+                canvas.paint_rect(area_to_paint,
+                                  {static_cast<uint8_t>(red), static_cast<uint8_t>(green), static_cast<uint8_t>(blue)});
 
                 if (spread > 0.4) {
                     flowers.emplace_back(*cur_luon, Point{x, y});

@@ -60,7 +60,7 @@ public:
             last_render_time = get_current_time();
             SDL_Rect fullscreen{0, 0, render_width, render_height};
             Canvas blackout{render_width, render_height};
-            blackout.paint_rect(fullscreen, {0, 0, 0, 255});
+            blackout.paint_rect(fullscreen, {0, 0, 0});
             opus->blit(blackout.finalize(), fullscreen);
             opus->blit(atmosphere->observe(), fullscreen);
             opus->blit(sage->observe(), fullscreen);
@@ -119,6 +119,7 @@ void bootstrap() {
 
     spdlog::info("( ) cosmology");
     psyche = mksp<Psyche>(LUON_COUNT);
+    current_cosmology = mkup<Cosmology>(render_width, render_height);
     spdlog::info("(~) cosmology");
 
     spdlog::info("( ) optics");

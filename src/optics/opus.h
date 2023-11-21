@@ -43,13 +43,13 @@ public:
 
     void paint_rect(SDL_Rect &rect, Color color) {
         SDL_SetRenderTarget(renderer, texture);
-        SDL_SetRenderDrawColor(renderer, color.red, color.green, color.blue, color.alpha);
+        SDL_SetRenderDrawColor(renderer, color.red, color.green, color.blue, 255);
         SDL_RenderFillRect(renderer, &rect);
     }
 
     void paint_point(Point point, Color color) {
         SDL_SetRenderTarget(renderer, texture);
-        SDL_SetRenderDrawColor(renderer, color.red, color.green, color.blue, color.alpha);
+        SDL_SetRenderDrawColor(renderer, color.red, color.green, color.blue, 255);
         SDL_RenderDrawPoint(renderer, point.x, point.y);
     }
 
