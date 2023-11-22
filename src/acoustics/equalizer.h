@@ -6,10 +6,10 @@ namespace PROJECT_NAMESPACE {
 
 class Equalizer : public Name {
 private:
-    float gain = 3.0;
+    float gain = 1.0;
 
 public:
-    void scale_gain(float delta) {
+    void nudge_gain(float delta) {
         gain += delta;
         if (gain < 0) gain = 0;
     }

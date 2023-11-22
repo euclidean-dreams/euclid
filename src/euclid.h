@@ -158,9 +158,9 @@ void bootstrap() {
                 multiplier = 10;
             }
             if (symbol == SDLK_RIGHTBRACKET) {
-                equalizer->scale_gain(0.1 * multiplier);
+                equalizer->nudge_gain(0.1 * multiplier);
             } else if (symbol == SDLK_LEFTBRACKET) {
-                equalizer->scale_gain(-0.1 * multiplier);
+                equalizer->nudge_gain(-0.1 * multiplier);
             } else if (symbol == SDLK_SPACE) {
                 render_toggle = !render_toggle;
             }
