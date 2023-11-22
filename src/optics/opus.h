@@ -23,14 +23,14 @@ class Canvas : public Name {
 public:
     int width;
     int height;
-    SDL_Texture *texture;
     SDL_Rect area;
+    SDL_Texture *texture;
 
     Canvas(int width, int height) :
             width{width},
             height{height},
-            texture{},
-            area{0, 0, width, height} {
+            area{0, 0, width, height},
+            texture{} {
         texture = SDL_CreateTexture(
                 renderer,
                 SDL_PIXELFORMAT_ARGB8888,
@@ -41,31 +41,43 @@ public:
         SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     }
 
-    void paint_rect(SDL_Rect &rect, Color color) {
-        SDL_SetRenderTarget(renderer, texture);
-        SDL_SetRenderDrawColor(renderer, color.red, color.green, color.blue, 255);
-        SDL_RenderFillRect(renderer, &rect);
-    }
-
-    void paint_point(Point point, Color color) {
-        SDL_SetRenderTarget(renderer, texture);
-        SDL_SetRenderDrawColor(renderer, color.red, color.green, color.blue, 255);
-        SDL_RenderDrawPoint(renderer, point.x, point.y);
+    Canvas(Lattice &lattice) :
+            width{lattice.width},
+            height{lattice.height},
+            area{0, 0, width, height},
+            texture{} {
+        Uint32 redMask, greenMask, blueMask, alphaMask;
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+        redMask = 0xff000000;
+    greenMask = 0x00ff0000;
+    blueMask = 0x0000ff00;
+    alphaMask = 0x000000ff;
+#else
+        redMask = 0x000000ff;
+        greenMask = 0x0000ff00;
+        blueMask = 0x00ff0000;
+        alphaMask = 0xff000000;
+#endif
+        auto surface = SDL_CreateRGBSurface(0, render_width, render_height, 32,
+                                            redMask, greenMask, blueMask, alphaMask);
+        auto pixels = (Uint32 *) surface->pixels;
+        memset(pixels, 0, render_width * render_height * sizeof(Uint32));
+        for (int i = 0; i < render_width * render_height; i++) {
+            pixels[i] = SDL_MapRGBA(surface->format, 0, 0, 0, 255);
+        }
+        for (auto &dot: lattice) {
+            auto coordinate = dot.first;
+            auto color = dot.second;
+            auto surface_color = SDL_MapRGBA(surface->format, color.red, color.green, color.blue, 255);
+            auto pixel_index = render_width * coordinate.y + coordinate.x;
+            pixels[pixel_index] = surface_color;
+        }
+        texture = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     }
 
     SDL_Texture *finalize() {
         return texture;
-    }
-
-    static up<Canvas> from_lattice(Lattice &lattice) {
-        auto canvas = mkup<Canvas>(lattice.width, lattice.height);
-        for (int y = 0; y < lattice.height; y++) {
-            for (int x = 0; x < lattice.width; x++) {
-                Point point{scast<float>(x), scast<float>(y)};
-                canvas->paint_point(point, lattice.get_color(x, y));
-            }
-        }
-        return canvas;
     }
 };
 

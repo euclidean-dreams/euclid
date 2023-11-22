@@ -13,7 +13,7 @@ namespace PROJECT_NAMESPACE {
 int FRAME_SIZE = 256;
 int STFT_SIZE = (32 * FRAME_SIZE) / 2 + 1;
 
-int RENDER_TICK_INTERVAL = 2000;
+int RENDER_TICK_INTERVAL = 9000;
 int render_width;
 int render_height;
 
@@ -52,12 +52,10 @@ public:
         if (get_current_time() - last_render_time > RENDER_TICK_INTERVAL) {
             last_render_time = get_current_time();
             SDL_Rect fullscreen{0, 0, render_width, render_height};
-            Canvas blackout{render_width, render_height};
-            blackout.paint_rect(fullscreen, {0, 0, 0});
-            opus->blit(blackout.finalize(), fullscreen);
             auto lattice = cosmos->observe();
             if (lattice != nullptr) {
-                opus->blit(Canvas::from_lattice(*lattice)->finalize(), fullscreen);
+                Canvas canvas{*lattice};
+                opus->blit(canvas.finalize(), fullscreen);
             }
             opus->render();
         }
