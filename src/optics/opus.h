@@ -56,6 +56,17 @@ public:
     SDL_Texture *finalize() {
         return texture;
     }
+
+    static up<Canvas> from_lattice(Lattice &lattice) {
+        auto canvas = mkup<Canvas>(lattice.width, lattice.height);
+        for (int y = 0; y < lattice.height; y++) {
+            for (int x = 0; x < lattice.width; x++) {
+                Point point{scast<float>(x), scast<float>(y)};
+                canvas->paint_point(point, lattice.get_color(x, y));
+            }
+        }
+        return canvas;
+    }
 };
 
 }

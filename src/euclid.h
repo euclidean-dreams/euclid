@@ -4,10 +4,7 @@
 #include "acoustics/audio_input.h"
 #include "acoustics/stft.h"
 #include "optics/opus.h"
-#include "cosmology/psyche.h"
 #include "acoustics/equalizer.h"
-#include "optics/sage.h"
-#include "optics/atmosphere.h"
 #include "cosmology.h"
 
 namespace PROJECT_NAMESPACE {
@@ -15,7 +12,6 @@ namespace PROJECT_NAMESPACE {
 // power of 2 >= 256
 int FRAME_SIZE = 256;
 int STFT_SIZE = (32 * FRAME_SIZE) / 2 + 1;
-int LUON_COUNT = STFT_SIZE;
 
 int RENDER_TICK_INTERVAL = 2000;
 int render_width;
@@ -24,10 +20,7 @@ int render_height;
 up<SDLAudioInput> audio_input;
 up<Equalizer> equalizer;
 up<FourierTransform> fourier_transform;
-sp<Psyche> psyche;
-up<Cosmology> current_cosmology;
-up<Sage> sage;
-up<Atmosphere> atmosphere;
+up<Cosmology> cosmos;
 up<Opus> opus;
 
 uint64_t last_render_time = 0;
@@ -48,7 +41,7 @@ private:
             auto magnitude = scast<float>(std::sqrt(std::pow(sample.real(), 2) + std::pow(sample.imag(), 2)));
             stft_magnitudes->push_back(magnitude);
         }
-        psyche->perceive(stft_magnitudes);
+        cosmos->experience(stft_magnitudes);
     }
 
 public:
@@ -62,9 +55,10 @@ public:
             Canvas blackout{render_width, render_height};
             blackout.paint_rect(fullscreen, {0, 0, 0});
             opus->blit(blackout.finalize(), fullscreen);
-            opus->blit(atmosphere->observe(), fullscreen);
-            opus->blit(sage->observe(), fullscreen);
-
+            auto lattice = cosmos->observe();
+            if (lattice != nullptr) {
+                opus->blit(Canvas::from_lattice(*lattice)->finalize(), fullscreen);
+            }
             opus->render();
         }
     }
@@ -118,24 +112,12 @@ void bootstrap() {
     spdlog::info("(~) acoustics");
 
     spdlog::info("( ) cosmology");
-    psyche = mksp<Psyche>(LUON_COUNT);
-    current_cosmology = mkup<Cosmology>(render_width, render_height);
+    cosmos = mkup<Cosmology>(render_width, render_height, STFT_SIZE);
     spdlog::info("(~) cosmology");
 
-    spdlog::info("( ) optics");
-    vec<int> harmony_indices{};
-    for (int i = 0; i < LUON_COUNT / 4; i++) {
-        harmony_indices.push_back(i);
-    }
-    sage = mkup<Sage>(render_width, render_height, psyche->create_harmony(harmony_indices));
-
-    harmony_indices.clear();
-    for (int i = 0; i < LUON_COUNT / 16; i++) {
-        harmony_indices.push_back(i);
-    }
-    atmosphere = mkup<Atmosphere>(render_width, render_height, psyche->create_harmony(harmony_indices));
+    spdlog::info("( ) opus");
     opus = mkup<Opus>();
-    spdlog::info("(~) optics");
+    spdlog::info("(~) opus");
 
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop(tick, 0, true);
