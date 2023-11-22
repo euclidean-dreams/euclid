@@ -73,6 +73,8 @@ public:
             pixels[pixel_index] = surface_color;
         }
         texture = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_FreeSurface(surface);
+
         SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     }
 

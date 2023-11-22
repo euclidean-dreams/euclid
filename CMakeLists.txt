@@ -29,12 +29,6 @@ set(
 add_executable(euclid ${SOURCE_FILES})
 target_include_directories(euclid PRIVATE src)
 
-###############
-## cosmology ##
-###############
-add_subdirectory(lib/cosmology)
-target_link_libraries(euclid PRIVATE cosmology)
-
 ###########
 ### WASM ##
 ###########
@@ -59,6 +53,12 @@ else ()
     include_directories(euclid ${SDL2_INCLUDE_DIRS})
     target_link_libraries(euclid PRIVATE ${SDL2_LIBRARIES})
 endif ()
+
+###############
+## cosmology ##
+###############
+add_subdirectory(lib/cosmology)
+target_link_libraries(euclid PRIVATE cosmology)
 
 ############
 ## Spdlog ##
