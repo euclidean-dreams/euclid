@@ -4,30 +4,26 @@
 #include "axioms.h"
 
 #ifdef __EMSCRIPTEN__
-
 #include <emscripten.h>
 #include <SDL2/SDL.h>
-
 #else
-
-#include <SDL.h>
-
+#include <SDL2/SDL.h>
 #endif
-
-#define PROJECT_NAMESPACE euclid
 
 using namespace cosmology;
 
 ///////////////////
 ////// constants
 ///////////
-namespace PROJECT_NAMESPACE {
+namespace euclid {
 
 extern int FRAME_SIZE;
 extern int render_width;
 extern int render_height;
 
+#ifdef OPUS
 SDL_Window *window;
 SDL_Renderer *renderer;
+#endif
 
 }

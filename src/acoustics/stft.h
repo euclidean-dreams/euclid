@@ -5,7 +5,7 @@
 #include "kiss_fftr.h"
 #include "paradigm.h"
 
-namespace PROJECT_NAMESPACE {
+namespace euclid {
 
 enum class WindowFunction {
     hamming = 0,

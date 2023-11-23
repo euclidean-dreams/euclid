@@ -3,7 +3,7 @@
 #include "paradigm.h"
 #include "ring_buffer.h"
 
-namespace PROJECT_NAMESPACE {
+namespace euclid {
 
 class SDLAudioInput : public Name {
 private:

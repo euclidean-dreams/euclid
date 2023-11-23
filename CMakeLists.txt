@@ -7,7 +7,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 project(euclid)
 include(lib/cmake-utils/dependency-integrator.cmake)
 
+
+#############
+## options ##
+#############
 option(debug "debug" OFF)
+
+# pick one!
+option(wasm "build for the web" OFF)
+option(local "build for your screen" OFF)
+option(sjofn "build for sjofn" OFF)
 
 
 ############
@@ -23,16 +32,36 @@ set(
         src/acoustics/equalizer.h
         src/acoustics/ring_buffer.h
         src/acoustics/stft.h
-
-        src/optics/opus.h
 )
+if (wasm)
+    set(
+            SOURCE_FILES
+            ${SOURCE_FILES}
+            src/optics/opus.h
+    )
+endif ()
+if (local)
+    set(
+            SOURCE_FILES
+            ${SOURCE_FILES}
+            src/optics/opus.h
+    )
+endif ()
+if (sjofn)
+    set(
+            SOURCE_FILES
+            ${SOURCE_FILES}
+            src/optics/wavelet.h src/optics/wavelet.cpp
+    )
+endif ()
 add_executable(euclid ${SOURCE_FILES})
 target_include_directories(euclid PRIVATE src)
+
 
 ###########
 ### WASM ##
 ###########
-if (EMSCRIPTEN)
+if (wasm)
     message("(~) building for wasm")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sUSE_SDL=2")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
@@ -46,13 +75,40 @@ if (EMSCRIPTEN)
     else ()
         message("(~) [ ] emcc debug")
     endif ()
-    add_compile_definitions(WASM EMSCRIPTEN)
-else ()
-    message("not building for wasm")
+    add_compile_definitions(WASM EMSCRIPTEN OPUS)
+endif ()
+
+
+############
+### local ##
+############
+if (local)
+    message("(~) building for your screen")
+    add_compile_definitions(LOCAL OPUS)
     find_package(SDL2 REQUIRED)
     include_directories(euclid ${SDL2_INCLUDE_DIRS})
     target_link_libraries(euclid PRIVATE ${SDL2_LIBRARIES})
 endif ()
+
+
+############
+### sjofn ##
+############
+if (sjofn)
+    message("(~) building for sjofn")
+    add_compile_definitions(SJOFN WAVELET)
+    find_package(SDL2 REQUIRED)
+    include_directories(euclid ${SDL2_INCLUDE_DIRS})
+    target_link_libraries(euclid PRIVATE ${SDL2_LIBRARIES})
+    integrate_cmake_dependency(
+            NAME pigpio
+            GIT_URL git@github.com:joan2937/pigpio.git
+            GIT_TAG c33738a320a3e28824af7807edafda440952c05d
+    )
+    target_include_directories(euclid PRIVATE ${CMAKE_BINARY_DIR}/pigpio-src)
+    target_link_libraries(euclid PRIVATE pigpio)
+endif ()
+
 
 ###############
 ## cosmology ##
@@ -60,10 +116,11 @@ endif ()
 add_subdirectory(lib/cosmology)
 target_link_libraries(euclid PRIVATE cosmology)
 
+
 ############
 ## Spdlog ##
 ############
-if (EMSCRIPTEN)
+if (wasm)
     integrate_cmake_dependency(
             NAME spdlog
             GIT_URL https://github.com/gabime/spdlog.git

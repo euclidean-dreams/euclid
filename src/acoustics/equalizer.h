@@ -2,7 +2,7 @@
 
 #include "paradigm.h"
 
-namespace PROJECT_NAMESPACE {
+namespace euclid {
 
 class Equalizer : public Name {
 private:

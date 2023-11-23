@@ -3,11 +3,17 @@
 #include "paradigm.h"
 #include "acoustics/audio_input.h"
 #include "acoustics/stft.h"
-#include "optics/opus.h"
 #include "acoustics/equalizer.h"
 #include "cosmology.h"
 
-namespace PROJECT_NAMESPACE {
+#ifdef OPUS
+#include "optics/opus.h"
+#endif
+#ifdef WAVELET
+#include "optics/wavelet.h"
+#endif
+
+namespace euclid {
 
 // power of 2 >= 256
 int FRAME_SIZE = 256;
@@ -21,7 +27,12 @@ up<SDLAudioInput> audio_input;
 up<Equalizer> equalizer;
 up<FourierTransform> fourier_transform;
 up<Cosmology> cosmos;
+#ifdef OPUS
 up<Opus> opus;
+#endif
+#ifdef WAVELET
+up<Wavelet> wavelet;
+#endif
 
 uint64_t last_render_time = 0;
 bool render_toggle = true;
@@ -53,11 +64,16 @@ public:
             last_render_time = get_current_time();
             SDL_Rect fullscreen{0, 0, render_width, render_height};
             auto lattice = cosmos->observe();
+#ifdef OPUS
             if (lattice != nullptr) {
                 Canvas canvas{*lattice};
                 opus->blit(canvas.finalize(), fullscreen);
             }
             opus->render();
+#endif
+#ifdef WAVELET
+            wavelet->send(mv(lattice));
+#endif
         }
     }
 
@@ -77,18 +93,36 @@ void bootstrap() {
     euclid = mkup<Euclid>();
 
     spdlog::info("( ) dimensions");
-#ifdef __EMSCRIPTEN__
+#ifdef WASM
     render_width = EM_ASM_INT(return screen.width);
     render_height = EM_ASM_INT(return screen.height);
-#else
+#endif
+#ifdef LOCAL
     render_width = 1470;
     render_height = 956;
+#endif
+#ifdef SJOFN
+    render_width = 64;
+    render_height = 64;
 #endif
     spdlog::info("render_width {}, render_height: {}", render_width, render_height);
     spdlog::info("(~) dimensions");
 
+    spdlog::info("( ) acoustics");
+    SDL_Init(SDL_INIT_AUDIO);
+    audio_input = mkup<SDLAudioInput>(FRAME_SIZE);
+    equalizer = mkup<Equalizer>();
+    fourier_transform = mkup<FourierTransform>();
+    spdlog::info("(~) acoustics");
+
+    spdlog::info("( ) cosmology");
+    cosmos = mkup<Cosmology>(render_width, render_height, STFT_SIZE);
+    spdlog::info("(~) cosmology");
+
+    spdlog::info("( ) optics");
+#ifdef OPUS
     spdlog::info("( ) renderer");
-    SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO);
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
     Uint32 window_flags = SDL_WINDOW_BORDERLESS;
     window = SDL_CreateWindow(
@@ -102,20 +136,12 @@ void bootstrap() {
     Uint32 rendererFlags = SDL_RENDERER_ACCELERATED;
     renderer = SDL_CreateRenderer(window, -1, rendererFlags);
     spdlog::info("(~) renderer");
-
-    spdlog::info("( ) acoustics");
-    audio_input = mkup<SDLAudioInput>(FRAME_SIZE);
-    equalizer = mkup<Equalizer>();
-    fourier_transform = mkup<FourierTransform>();
-    spdlog::info("(~) acoustics");
-
-    spdlog::info("( ) cosmology");
-    cosmos = mkup<Cosmology>(render_width, render_height, STFT_SIZE);
-    spdlog::info("(~) cosmology");
-
-    spdlog::info("( ) opus");
     opus = mkup<Opus>();
-    spdlog::info("(~) opus");
+#endif
+#ifdef WAVELET
+    wavelet = mkup<Wavelet>();
+#endif
+    spdlog::info("(~) optics");
 
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop(tick, 0, true);
