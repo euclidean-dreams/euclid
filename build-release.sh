@@ -2,7 +2,7 @@
 
 mkdir -p build-wasm-release &&
 cd build-wasm-release &&
-emcmake cmake -Ddebug=OFF .. &&
+emcmake cmake -Dwasm=ON -Ddebug=OFF .. &&
 cmake --build . &&
 cd .. &&
 
