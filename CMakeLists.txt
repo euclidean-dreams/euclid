@@ -37,21 +37,21 @@ if (wasm)
     set(
             SOURCE_FILES
             ${SOURCE_FILES}
-            src/optics/opus.h
+            src/optics/opus.cpp src/optics/opus.h
     )
 endif ()
 if (mac)
     set(
             SOURCE_FILES
             ${SOURCE_FILES}
-            src/optics/opus.h
+            src/optics/opus.cpp src/optics/opus.h
     )
 endif ()
 if (sjofn)
     set(
             SOURCE_FILES
             ${SOURCE_FILES}
-            src/optics/wavelet.h src/optics/wavelet.cpp
+            src/optics/wavelet.cpp src/optics/wavelet.h
     )
 endif ()
 add_executable(euclid ${SOURCE_FILES})
@@ -91,8 +91,8 @@ if (mac)
     find_package(SDL2 REQUIRED)
     include_directories(euclid ${SDL2_INCLUDE_DIRS})
     target_link_libraries(euclid PRIVATE ${SDL2_LIBRARIES})
-    find_package(SDL2_ttf REQUIRED)
-    include_directories(euclid SDL2_ttf)
+    include_directories(euclid /opt/homebrew/Cellar/sdl2_ttf/2.20.2/include)
+    target_link_libraries(euclid PUBLIC /opt/homebrew/Cellar/sdl2_ttf/2.20.2/lib/libSDL2_ttf.dylib)
 endif ()
 
 

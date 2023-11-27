@@ -21,9 +21,4 @@ extern int FRAME_SIZE;
 extern int render_width;
 extern int render_height;
 
-#ifdef OPUS
-SDL_Window *window;
-SDL_Renderer *renderer;
-#endif
-
 }

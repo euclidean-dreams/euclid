@@ -29,6 +29,8 @@ up<FourierTransform> fourier_transform;
 up<Cosmology> cosmos;
 #ifdef OPUS
 up<Opus> opus;
+SDL_Window *window;
+SDL_Renderer *renderer;
 #endif
 #ifdef WAVELET
 up<Wavelet> wavelet;
@@ -62,12 +64,11 @@ public:
         }
         if (get_current_time() - last_render_time > RENDER_TICK_INTERVAL) {
             last_render_time = get_current_time();
-            SDL_Rect fullscreen{0, 0, render_width, render_height};
             auto lattice = cosmos->observe();
 #ifdef OPUS
             if (lattice != nullptr) {
                 Canvas canvas{*lattice};
-                opus->blit(canvas.finalize(), fullscreen);
+                opus->blit(canvas.finalize(), canvas.area);
             }
             opus->render();
 #endif
