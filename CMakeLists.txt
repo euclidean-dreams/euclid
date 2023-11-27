@@ -38,6 +38,7 @@ if (wasm)
             SOURCE_FILES
             ${SOURCE_FILES}
             src/optics/opus.cpp src/optics/opus.h
+            src/input/fascia.cpp src/input/fascia.h
     )
 endif ()
 if (mac)
@@ -45,6 +46,7 @@ if (mac)
             SOURCE_FILES
             ${SOURCE_FILES}
             src/optics/opus.cpp src/optics/opus.h
+            src/input/fascia.cpp src/input/fascia.h
     )
 endif ()
 if (sjofn)

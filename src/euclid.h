@@ -8,6 +8,7 @@
 
 #ifdef OPUS
 #include "optics/opus.h"
+#include "input/fascia.h"
 #endif
 #ifdef WAVELET
 #include "optics/wavelet.h"
@@ -29,6 +30,7 @@ up<FourierTransform> fourier_transform;
 up<Cosmology> cosmos;
 #ifdef OPUS
 up<Opus> opus;
+up<Fascia> fascia;
 SDL_Window *window;
 SDL_Renderer *renderer;
 #endif
@@ -70,6 +72,8 @@ public:
                 Canvas canvas{*lattice};
                 opus->blit(canvas.finalize(), canvas.area);
             }
+            auto canvas = fascia->observe();
+            opus->blit(canvas->finalize(), canvas->area);
             opus->render();
 #endif
 #ifdef WAVELET
@@ -138,6 +142,7 @@ void bootstrap() {
     renderer = SDL_CreateRenderer(window, -1, rendererFlags);
     spdlog::info("(~) renderer");
     opus = mkup<Opus>();
+    fascia = mkup<Fascia>();
 #endif
 #ifdef WAVELET
     wavelet = mkup<Wavelet>();

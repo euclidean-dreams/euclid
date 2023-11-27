@@ -1,6 +1,5 @@
 #pragma once
 
-#include <SDL2/SDL_ttf.h>
 #include "paradigm.h"
 
 namespace euclid {
@@ -26,27 +25,8 @@ public:
     SDL_Texture *finalize();
 };
 
-class Fascia : public Name {
-private:
-    TTF_Font *font;
-
-public:
-    Fascia();
-
-    ~Fascia();
-
-    up<Canvas> observe();
-
-    void draw_text(Canvas &canvas, std::string &text, SDL_Color color, Coordinate origin);
-};
-
 class Opus : public Name {
-private:
-    up<Fascia> fascia;
-
 public:
-    Opus() : fascia{mkup<Fascia>()} {}
-
     void blit(SDL_Texture *texture, SDL_Rect destination);
 
     void render();
