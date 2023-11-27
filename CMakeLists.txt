@@ -15,7 +15,7 @@ option(debug "debug" OFF)
 
 # pick one!
 option(wasm "build for the web" OFF)
-option(local "build for your screen" OFF)
+option(mac "build for your mac" OFF)
 option(sjofn "build for sjofn" OFF)
 
 
@@ -40,7 +40,7 @@ if (wasm)
             src/optics/opus.h
     )
 endif ()
-if (local)
+if (mac)
     set(
             SOURCE_FILES
             ${SOURCE_FILES}
@@ -64,10 +64,12 @@ target_include_directories(euclid PRIVATE src)
 if (wasm)
     message("(~) building for wasm")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sUSE_SDL=2")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sUSE_SDL_TTF=2")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sALLOW_MEMORY_GROWTH")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sMAXIMUM_MEMORY=4GB")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sPTHREAD_POOL_SIZE=8")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --embed-file assets")
     if (debug)
         message("(~) [x] emcc debug")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sASSERTIONS")
@@ -79,15 +81,18 @@ if (wasm)
 endif ()
 
 
-############
-### local ##
-############
-if (local)
-    message("(~) building for your screen")
-    add_compile_definitions(LOCAL OPUS)
+##########
+### mac ##
+##########
+if (mac)
+    message("(~) building for your mac")
+    add_compile_definitions(MAC OPUS)
+    set(CMAKE_PREFIX_PATH /opt/homebrew/lib)
     find_package(SDL2 REQUIRED)
     include_directories(euclid ${SDL2_INCLUDE_DIRS})
     target_link_libraries(euclid PRIVATE ${SDL2_LIBRARIES})
+    find_package(SDL2_ttf REQUIRED)
+    include_directories(euclid SDL2_ttf)
 endif ()
 
 

@@ -97,7 +97,7 @@ void bootstrap() {
     render_width = EM_ASM_INT(return screen.width);
     render_height = EM_ASM_INT(return screen.height);
 #endif
-#ifdef LOCAL
+#ifdef MAC
     render_width = 1470;
     render_height = 956;
 #endif
