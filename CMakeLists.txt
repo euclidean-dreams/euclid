@@ -129,7 +129,7 @@ if (wasm)
     target_link_libraries(euclid PRIVATE spdlog::spdlog)
 else ()
     find_package(spdlog REQUIRED)
-    target_link_libraries(cosmology PRIVATE spdlog::spdlog_header_only)
+    target_link_libraries(euclid PRIVATE spdlog::spdlog_header_only)
 endif ()
 
 
