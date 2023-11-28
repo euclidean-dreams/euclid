@@ -2,7 +2,7 @@
 
 namespace euclid {
 
-Fascia::Fascia() {
+Fascia::Fascia(Equalizer &equalizer) : equalizer{equalizer} {
     TTF_Init();
     font = TTF_OpenFont("./assets/DMSans-Bold.ttf", 33);
 }
@@ -12,21 +12,36 @@ Fascia::~Fascia() {
     TTF_CloseFont(font);
 }
 
+void Fascia::handle_events() {
+    SDL_Event event;
+    while (SDL_PollEvent(&event) != 0) {
+        if (event.type == SDL_QUIT) {
+            running = false;
+        } else if (event.type == SDL_KEYDOWN) {
+            auto symbol = event.key.keysym.sym;
+            auto keymod = event.key.keysym.mod;
+            auto shift_held_down = SDLK_LSHIFT & keymod;
+            auto multiplier = 1;
+            if (shift_held_down) {
+                multiplier = 10;
+            }
+            if (symbol == SDLK_UP) {
+                equalizer.nudge_gain(0.1 * multiplier);
+            } else if (symbol == SDLK_DOWN) {
+                equalizer.nudge_gain(-0.1 * multiplier);
+            } else if (symbol == SDLK_SPACE) {
+            }
+        }
+    }
+}
+
 up<Canvas> Fascia::observe() {
     auto canvas = mkup<Canvas>(render_width, render_height);
     auto horizontal_offset = render_width / 100;
     auto vertical_offset = render_height / 30;
 
-    std::string excitation_label = "excitation ~ " + std::to_string(COSMOLOGY_EXCITATION);
-    draw_text(*canvas, excitation_label, {111, 133, 199}, {horizontal_offset, vertical_offset});
-
-    std::string excitation_decrease_label = "<";
-    Coordinate excitation_decrease_position{horizontal_offset * 2, vertical_offset * 2};
-    draw_text(*canvas, excitation_decrease_label, {111, 133, 199}, excitation_decrease_position);
-
-    std::string excitation_increase_label = ">";
-    Coordinate excitation_increase_position{horizontal_offset * 9, vertical_offset * 2};
-    draw_text(*canvas, excitation_increase_label, {111, 133, 199}, excitation_increase_position);
+    std::string sensitivity_label = "sensitivity ~ " + std::to_string(equalizer.get_gain());
+    draw_text(*canvas, sensitivity_label, {111, 133, 199}, {horizontal_offset, vertical_offset});
     return canvas;
 }
 

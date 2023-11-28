@@ -21,4 +21,6 @@ extern int FRAME_SIZE;
 extern int render_width;
 extern int render_height;
 
+extern bool running;
+
 }

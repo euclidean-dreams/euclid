@@ -21,6 +21,8 @@ public:
         }
         return output;
     }
+
+    float get_gain() { return gain; }
 };
 
 }

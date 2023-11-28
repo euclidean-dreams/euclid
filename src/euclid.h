@@ -23,6 +23,7 @@ int STFT_SIZE = (32 * FRAME_SIZE) / 2 + 1;
 int RENDER_TICK_INTERVAL = 9000;
 int render_width;
 int render_height;
+bool running = true;
 
 up<SDLAudioInput> audio_input;
 up<Equalizer> equalizer;
@@ -39,9 +40,8 @@ up<Wavelet> wavelet;
 #endif
 
 uint64_t last_render_time = 0;
-bool render_toggle = true;
 
-class Euclid : public Circlet {
+class Euclid : public Name {
 private:
     void process_input() {
         auto audio = audio_input->ring_buffer.get_next_signal();
@@ -60,7 +60,7 @@ private:
     }
 
 public:
-    void activate() override {
+    void activate() {
         while (audio_input->ring_buffer.next_signal_is_ready()) {
             process_input();
         }
@@ -75,15 +75,12 @@ public:
             auto canvas = fascia->observe();
             opus->blit(canvas->finalize(), canvas->area);
             opus->render();
+            fascia->handle_events();
 #endif
 #ifdef WAVELET
             wavelet->send(mv(lattice));
 #endif
         }
-    }
-
-    uint64_t get_tick_interval() override {
-        return RENDER_TICK_INTERVAL;
     }
 };
 
@@ -142,41 +139,19 @@ void bootstrap() {
     renderer = SDL_CreateRenderer(window, -1, rendererFlags);
     spdlog::info("(~) renderer");
     opus = mkup<Opus>();
-    fascia = mkup<Fascia>();
+    fascia = mkup<Fascia>(*equalizer);
 #endif
 #ifdef WAVELET
     wavelet = mkup<Wavelet>();
 #endif
     spdlog::info("(~) optics");
+    spdlog::info("(~) Initialized euclid");
 
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop(tick, 0, true);
-    spdlog::info("(~) Initialized euclid");
 #else
-    auto thread = Circlet::begin(mv(euclid));
-    SDL_Event event;
-    bool running = true;
-    spdlog::info("(~) Initialized euclid");
     while (running) {
-        SDL_WaitEvent(&event);
-        if (event.type == SDL_QUIT) {
-            running = false;
-        } else if (event.type == SDL_KEYDOWN) {
-            auto symbol = event.key.keysym.sym;
-            auto keymod = event.key.keysym.mod;
-            auto shift_held_down = SDLK_LSHIFT & keymod;
-            auto multiplier = 1;
-            if (shift_held_down) {
-                multiplier = 10;
-            }
-            if (symbol == SDLK_RIGHTBRACKET) {
-                equalizer->nudge_gain(0.1 * multiplier);
-            } else if (symbol == SDLK_LEFTBRACKET) {
-                equalizer->nudge_gain(-0.1 * multiplier);
-            } else if (symbol == SDLK_SPACE) {
-                render_toggle = !render_toggle;
-            }
-        }
+        tick();
     }
 #endif
 };
