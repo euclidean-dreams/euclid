@@ -34,3 +34,14 @@ body {
     transform: translate(-50%, -50%);
     cursor: pointer;
 }
+
+#instructions {
+    position: fixed;
+    font-style: italic;
+    font-size: 1.5vw;
+    color: #009686;
+    text-shadow: 1px 1px 1px #00564b;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
