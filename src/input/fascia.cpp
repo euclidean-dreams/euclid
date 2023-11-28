@@ -4,7 +4,7 @@ namespace euclid {
 
 Fascia::Fascia(Equalizer &equalizer) : equalizer{equalizer} {
     TTF_Init();
-    font = TTF_OpenFont("./assets/DMSans-Bold.ttf", 33);
+    font = TTF_OpenFont("./assets/DMSans-Bold.ttf", 25);
 }
 
 Fascia::~Fascia() {
@@ -25,11 +25,20 @@ void Fascia::handle_events() {
             if (shift_held_down) {
                 multiplier = 10;
             }
-            if (symbol == SDLK_UP) {
+            if (symbol == SDLK_SPACE) {
+                display_fascia = !display_fascia;
+            } else if (symbol == SDLK_q) {
                 equalizer.nudge_gain(0.1 * multiplier);
-            } else if (symbol == SDLK_DOWN) {
+            } else if (symbol == SDLK_a) {
                 equalizer.nudge_gain(-0.1 * multiplier);
-            } else if (symbol == SDLK_SPACE) {
+            } else if (symbol == SDLK_w) {
+                SPEED = embind_flt(0, SPEED + 0.1 * multiplier, 99999);
+            } else if (symbol == SDLK_s) {
+                SPEED = embind_flt(0, SPEED - 0.1 * multiplier, 99999);
+            } else if (symbol == SDLK_t) {
+                SIZE = embind_flt(0, SIZE + 0.1 * multiplier, 99999);
+            } else if (symbol == SDLK_g) {
+                SIZE = embind_flt(0, SIZE - 0.1 * multiplier, 99999);
             }
         }
     }
@@ -37,11 +46,19 @@ void Fascia::handle_events() {
 
 up<Canvas> Fascia::observe() {
     auto canvas = mkup<Canvas>(render_width, render_height);
-    auto horizontal_offset = render_width / 100;
-    auto vertical_offset = render_height / 30;
+    if (display_fascia) {
+        auto horizontal_offset = render_width / 100;
+        auto vertical_offset = render_height / 30;
 
-    std::string sensitivity_label = "sensitivity ~ " + std::to_string(equalizer.get_gain());
-    draw_text(*canvas, sensitivity_label, {111, 133, 199}, {horizontal_offset, vertical_offset});
+        std::string label = "[q|a] sensitivity ~ " + std::to_string(equalizer.get_gain());
+        draw_text(*canvas, label, {210, 99, 150}, {horizontal_offset, vertical_offset});
+
+        label = "[w|s] speed ~ " + std::to_string(SPEED);
+        draw_text(*canvas, label, {210, 99, 150}, {horizontal_offset, vertical_offset * 2});
+
+        label = "[t|g] size ~ " + std::to_string(SIZE);
+        draw_text(*canvas, label, {210, 99, 150}, {horizontal_offset, vertical_offset * 3});
+    }
     return canvas;
 }
 

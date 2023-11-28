@@ -11,6 +11,7 @@ class Fascia : public Name {
 private:
     Equalizer &equalizer;
     TTF_Font *font;
+    bool display_fascia = false;
 
     void draw_text(Canvas &canvas, std::string &text, SDL_Color color, Coordinate origin);
 
