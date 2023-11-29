@@ -32,13 +32,13 @@ void Fascia::handle_events() {
             } else if (symbol == SDLK_a) {
                 equalizer.nudge_gain(-0.1 * multiplier);
             } else if (symbol == SDLK_w) {
-                SPEED = embind_flt(0, SPEED + 0.1 * multiplier, 99999);
+                DIRECTION = embind_flt(0, DIRECTION + 0.1 * multiplier, 99999);
             } else if (symbol == SDLK_s) {
-                SPEED = embind_flt(0, SPEED - 0.1 * multiplier, 99999);
+                DIRECTION = embind_flt(0, DIRECTION - 0.1 * multiplier, 99999);
             } else if (symbol == SDLK_t) {
-                SIZE = embind_flt(0, SIZE + 0.1 * multiplier, 99999);
+                MAGNITUDE = embind_flt(0, MAGNITUDE + 0.1 * multiplier, 99999);
             } else if (symbol == SDLK_g) {
-                SIZE = embind_flt(0, SIZE - 0.1 * multiplier, 99999);
+                MAGNITUDE = embind_flt(0, MAGNITUDE - 0.1 * multiplier, 99999);
             }
         }
     }
@@ -53,10 +53,10 @@ up<Canvas> Fascia::observe() {
         std::string label = "[q|a] sensitivity ~ " + std::to_string(equalizer.get_gain());
         draw_text(*canvas, label, {210, 99, 150}, {horizontal_offset, vertical_offset});
 
-        label = "[w|s] speed ~ " + std::to_string(SPEED);
+        label = "[w|s] speed ~ " + std::to_string(DIRECTION);
         draw_text(*canvas, label, {210, 99, 150}, {horizontal_offset, vertical_offset * 2});
 
-        label = "[t|g] size ~ " + std::to_string(SIZE);
+        label = "[t|g] size ~ " + std::to_string(MAGNITUDE);
         draw_text(*canvas, label, {210, 99, 150}, {horizontal_offset, vertical_offset * 3});
     }
     return canvas;
