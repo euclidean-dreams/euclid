@@ -45,7 +45,7 @@ Canvas::Canvas(Lattice &lattice) :
         auto coordinate = dot.first;
         auto color = dot.second;
         auto surface_color = SDL_MapRGBA(surface->format, color.red, color.green, color.blue, 255);
-        auto pixel_index = render_width * coordinate.y + coordinate.x;
+        auto pixel_index = render_width * (render_height - 1 - coordinate.y) + coordinate.x;
         pixels[pixel_index] = surface_color;
     }
     texture = SDL_CreateTextureFromSurface(renderer, surface);

@@ -11,7 +11,7 @@ private:
 public:
     void nudge_gain(float delta) {
         gain += delta;
-        if (gain < 0) gain = 0;
+        if (gain < 0) gain = 0.01;
     }
 
     up<Signal<float>> equalize(up<Signal<float>> origin) {

@@ -32,13 +32,25 @@ void Fascia::handle_events() {
             } else if (symbol == SDLK_a) {
                 equalizer.nudge_gain(-0.1 * multiplier);
             } else if (symbol == SDLK_w) {
-                DIRECTION = embind_flt(0, DIRECTION + 0.1 * multiplier, 99999);
+                MOVEMENT = embind_flt(0.01, MOVEMENT + 0.1 * multiplier, 99999);
             } else if (symbol == SDLK_s) {
-                DIRECTION = embind_flt(0, DIRECTION - 0.1 * multiplier, 99999);
+                MOVEMENT = embind_flt(0.01, MOVEMENT - 0.1 * multiplier, 99999);
+            } else if (symbol == SDLK_e) {
+                MAGNITUDE = embind_flt(0.01, MAGNITUDE + 0.1 * multiplier, 99999);
+            } else if (symbol == SDLK_d) {
+                MAGNITUDE = embind_flt(0.01, MAGNITUDE - 0.1 * multiplier, 99999);
+            } else if (symbol == SDLK_r) {
+                RESONANCE = embind_flt(0.01, RESONANCE + 0.1 * multiplier, 99999);
+            } else if (symbol == SDLK_f) {
+                TWIST = embind_flt(0.01, TWIST - 0.1 * multiplier, 99999);
             } else if (symbol == SDLK_t) {
-                MAGNITUDE = embind_flt(0, MAGNITUDE + 0.1 * multiplier, 99999);
+                TWIST = embind_flt(0.01, TWIST + 0.1 * multiplier, 99999);
             } else if (symbol == SDLK_g) {
-                MAGNITUDE = embind_flt(0, MAGNITUDE - 0.1 * multiplier, 99999);
+                TWIST = embind_flt(0.01, TWIST - 0.1 * multiplier, 99999);
+            } else if (symbol == SDLK_y) {
+                CHAOS = embind_flt(0.01, CHAOS + 0.1 * multiplier, 99999);
+            } else if (symbol == SDLK_h) {
+                CHAOS = embind_flt(0.01, CHAOS - 0.1 * multiplier, 99999);
             }
         }
     }
@@ -50,14 +62,23 @@ up<Canvas> Fascia::observe() {
         auto horizontal_offset = render_width / 100;
         auto vertical_offset = render_height / 30;
 
-        std::string label = "[q|a] sensitivity ~ " + std::to_string(equalizer.get_gain());
+        std::string label = "[q|a] gain ~ " + std::to_string(equalizer.get_gain());
         draw_text(*canvas, label, {210, 99, 150}, {horizontal_offset, vertical_offset});
 
-        label = "[w|s] speed ~ " + std::to_string(DIRECTION);
+        label = "[w|s] movement ~ " + std::to_string(MOVEMENT);
         draw_text(*canvas, label, {210, 99, 150}, {horizontal_offset, vertical_offset * 2});
 
-        label = "[t|g] size ~ " + std::to_string(MAGNITUDE);
+        label = "[e|d] magnitude ~ " + std::to_string(MAGNITUDE);
         draw_text(*canvas, label, {210, 99, 150}, {horizontal_offset, vertical_offset * 3});
+
+        label = "[r|f] resonance ~ " + std::to_string(RESONANCE);
+        draw_text(*canvas, label, {210, 99, 150}, {horizontal_offset, vertical_offset * 4});
+
+        label = "[t|g] twist ~ " + std::to_string(TWIST);
+        draw_text(*canvas, label, {210, 99, 150}, {horizontal_offset, vertical_offset * 5});
+
+        label = "[y|h] chaos ~ " + std::to_string(CHAOS);
+        draw_text(*canvas, label, {210, 99, 150}, {horizontal_offset, vertical_offset * 6});
     }
     return canvas;
 }
