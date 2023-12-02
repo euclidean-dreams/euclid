@@ -42,7 +42,7 @@ void Fascia::handle_events() {
             } else if (symbol == SDLK_r) {
                 RESONANCE = embind_flt(0.01, RESONANCE + 0.1 * multiplier, 99999);
             } else if (symbol == SDLK_f) {
-                TWIST = embind_flt(0.01, TWIST - 0.1 * multiplier, 99999);
+                RESONANCE = embind_flt(0.01, RESONANCE - 0.1 * multiplier, 99999);
             } else if (symbol == SDLK_t) {
                 TWIST = embind_flt(0.01, TWIST + 0.1 * multiplier, 99999);
             } else if (symbol == SDLK_g) {
