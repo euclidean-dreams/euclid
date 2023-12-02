@@ -37,9 +37,14 @@ Canvas::Canvas(Lattice &lattice) :
     auto surface = SDL_CreateRGBSurface(0, render_width, render_height, 32,
                                         redMask, greenMask, blueMask, alphaMask);
     auto pixels = (Uint32 *) surface->pixels;
-    memset(pixels, 0, render_width * render_height * sizeof(Uint32));
     for (int i = 0; i < render_width * render_height; i++) {
-        pixels[i] = SDL_MapRGBA(surface->format, 0, 0, 0, 255);
+        pixels[i] = SDL_MapRGBA(
+                surface->format,
+                lattice.null_color.red,
+                lattice.null_color.green,
+                lattice.null_color.blue,
+                255
+        );
     }
     for (auto &dot: lattice) {
         auto coordinate = dot.first;

@@ -59,26 +59,23 @@ void Fascia::handle_events() {
 up<Canvas> Fascia::observe() {
     auto canvas = mkup<Canvas>(render_width, render_height);
     if (display_fascia) {
-        auto horizontal_offset = render_width / 100;
-        auto vertical_offset = render_height / 30;
+        auto horizontal_offset = render_width / 88;
+        auto vertical_offset_increment = render_height / 22;
+        vec<std::string> lines;
+        lines.push_back("Knobs and Dials:");
+        lines.push_back("[q|a] gain ~ " + std::to_string(equalizer.get_gain()));
+        lines.push_back("[w|s] movement ~ " + std::to_string(MOVEMENT));
+        lines.push_back("[e|d] magnitude ~ " + std::to_string(MAGNITUDE));
+        lines.push_back("[r|f] resonance ~ " + std::to_string(RESONANCE));
+        lines.push_back("[t|g] twist ~ " + std::to_string(TWIST));
+        lines.push_back("[y|h] chaos ~ " + std::to_string(CHAOS));
+        lines.push_back("(~) please enjoy!");
 
-        std::string label = "[q|a] gain ~ " + std::to_string(equalizer.get_gain());
-        draw_text(*canvas, label, {210, 99, 150}, {horizontal_offset, vertical_offset});
-
-        label = "[w|s] movement ~ " + std::to_string(MOVEMENT);
-        draw_text(*canvas, label, {210, 99, 150}, {horizontal_offset, vertical_offset * 2});
-
-        label = "[e|d] magnitude ~ " + std::to_string(MAGNITUDE);
-        draw_text(*canvas, label, {210, 99, 150}, {horizontal_offset, vertical_offset * 3});
-
-        label = "[r|f] resonance ~ " + std::to_string(RESONANCE);
-        draw_text(*canvas, label, {210, 99, 150}, {horizontal_offset, vertical_offset * 4});
-
-        label = "[t|g] twist ~ " + std::to_string(TWIST);
-        draw_text(*canvas, label, {210, 99, 150}, {horizontal_offset, vertical_offset * 5});
-
-        label = "[y|h] chaos ~ " + std::to_string(CHAOS);
-        draw_text(*canvas, label, {210, 99, 150}, {horizontal_offset, vertical_offset * 6});
+        auto vertical_offset = horizontal_offset;
+        for (auto &line: lines) {
+            draw_text(*canvas, line, {210, 99, 150}, {horizontal_offset, vertical_offset});
+            vertical_offset += vertical_offset_increment;
+        }
     }
     return canvas;
 }
