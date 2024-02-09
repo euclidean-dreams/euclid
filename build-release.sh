@@ -2,6 +2,7 @@
 
 mkdir -p build-wasm-release &&
 cd build-wasm-release &&
+cp -R ../assets assets &&
 emcmake cmake -Dwasm=ON -Ddebug=OFF .. &&
 cmake --build . &&
 cd .. &&
