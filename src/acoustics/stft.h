@@ -25,11 +25,11 @@ private:
     lst<up<Signal<float>>> input_signals{};
 
     float hamming_window(int sample_number) const {
-        return static_cast<float>(0.53836 - 0.46164 * std::cosf((2 * M_PI * sample_number) / (fft_size - 1)));
+        return static_cast<float>(0.53836 - 0.46164 * std::cos((2 * M_PI * sample_number) / (fft_size - 1)));
     }
 
     float hann_window(int sample_number) const {
-        return static_cast<float>(0.5 * (1 - std::cosf((2 * M_PI * sample_number) / (fft_size - 1))));
+        return static_cast<float>(0.5 * (1 - std::cos((2 * M_PI * sample_number) / (fft_size - 1))));
     }
 
 public:

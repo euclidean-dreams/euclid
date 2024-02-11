@@ -6,7 +6,15 @@ namespace euclid {
 
 class Equalizer : public Name {
 private:
-    float gain = 1.0;
+#ifdef WASM
+    float gain = 10.0;
+#endif
+#ifdef MAC
+    float gain = 10.0;
+#endif
+#ifdef SJOFN
+    float gain = 33.0;
+#endif
 
 public:
     void nudge_gain(float delta) {
