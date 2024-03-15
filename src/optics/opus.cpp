@@ -22,36 +22,37 @@ Canvas::Canvas(Lattice &lattice) :
         height{lattice.height},
         area{0, 0, width, height},
         texture{} {
-    Uint32 redMask, greenMask, blueMask, alphaMask;
+    Uint32 red_mask, green_mask, blue_mask, alpha_mask;
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
     redMask = 0xff000000;
     greenMask = 0x00ff0000;
     blueMask = 0x0000ff00;
     alphaMask = 0x000000ff;
 #else
-    redMask = 0x000000ff;
-    greenMask = 0x0000ff00;
-    blueMask = 0x00ff0000;
-    alphaMask = 0xff000000;
+    red_mask = 0x000000ff;
+    green_mask = 0x0000ff00;
+    blue_mask = 0x00ff0000;
+    alpha_mask = 0xff000000;
 #endif
     auto surface = SDL_CreateRGBSurface(0, render_width, render_height, 32,
-                                        redMask, greenMask, blueMask, alphaMask);
+                                        red_mask, green_mask, blue_mask, alpha_mask);
     auto pixels = (Uint32 *) surface->pixels;
     for (int i = 0; i < render_width * render_height; i++) {
-        pixels[i] = SDL_MapRGBA(
-                surface->format,
-                lattice.null_color.red,
-                lattice.null_color.green,
-                lattice.null_color.blue,
-                255
-        );
+        auto null_color = lattice.null_color;
+        pixels[i] = SDL_MapRGBA(surface->format, null_color.red, null_color.green, null_color.blue, 255);
     }
     for (auto &dot: lattice) {
         auto coordinate = dot.first;
         auto color = dot.second;
         auto surface_color = SDL_MapRGBA(surface->format, color.red, color.green, color.blue, 255);
-        auto pixel_index = render_width * (render_height - 1 - coordinate.y) + coordinate.x;
-        pixels[pixel_index] = surface_color;
+        auto initial_y = coordinate.y * canvas_pixel_stretch;
+        for (int y = initial_y; y < initial_y + canvas_pixel_stretch; y++) {
+            auto initial_x = coordinate.x * canvas_pixel_stretch;
+            for (int x = initial_x; x < initial_x + canvas_pixel_stretch; x++) {
+                auto pixel_index = render_width * (render_height - 1 - y) + x;
+                pixels[pixel_index] = surface_color;
+            }
+        }
     }
     texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);

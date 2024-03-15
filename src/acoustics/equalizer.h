@@ -13,7 +13,10 @@ private:
     float gain = 10.0;
 #endif
 #ifdef SJOFN
-    float gain = 33.0;
+    float gain = 12.0;
+#endif
+#ifdef TYR
+    float gain = 12.0;
 #endif
 
 public:

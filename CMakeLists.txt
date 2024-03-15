@@ -16,7 +16,9 @@ option(debug "debug" OFF)
 # pick one!
 option(wasm "build for the web" OFF)
 option(mac "build for your mac" OFF)
+option(wamulator "build for your wavelet emulator" OFF)
 option(sjofn "build for sjofn" OFF)
+option(tyr "build for tyr" OFF)
 
 
 ############
@@ -41,7 +43,7 @@ if (wasm)
             src/input/fascia.cpp src/input/fascia.h
     )
 endif ()
-if (mac)
+if (mac OR wamulator)
     set(
             SOURCE_FILES
             ${SOURCE_FILES}
@@ -50,6 +52,13 @@ if (mac)
     )
 endif ()
 if (sjofn)
+    set(
+            SOURCE_FILES
+            ${SOURCE_FILES}
+            src/optics/wavelet.cpp src/optics/wavelet.h
+    )
+endif ()
+if (tyr)
     set(
             SOURCE_FILES
             ${SOURCE_FILES}
@@ -86,15 +95,19 @@ endif ()
 ##########
 ### mac ##
 ##########
-if (mac)
+if (mac OR wamulator)
     message("(~) building for your mac")
     add_compile_definitions(MAC OPUS)
+    if (wamulator)
+        add_compile_definitions(WAMULATOR)
+    endif ()
     set(CMAKE_PREFIX_PATH /opt/homebrew/lib)
     find_package(SDL2 REQUIRED)
     include_directories(euclid ${SDL2_INCLUDE_DIRS})
     target_link_libraries(euclid PRIVATE ${SDL2_LIBRARIES})
     include_directories(euclid /opt/homebrew/Cellar/sdl2_ttf/2.22.0/include)
     target_link_libraries(euclid PUBLIC /opt/homebrew/Cellar/sdl2_ttf/2.22.0/lib/libSDL2_ttf.dylib)
+    target_link_libraries(euclid PUBLIC /opt/homebrew/Cellar/fmt/10.2.1/lib/libfmt.dylib)
 endif ()
 
 
@@ -104,6 +117,25 @@ endif ()
 if (sjofn)
     message("(~) building for sjofn")
     add_compile_definitions(SJOFN WAVELET)
+    find_package(SDL2 REQUIRED)
+    include_directories(euclid ${SDL2_INCLUDE_DIRS})
+    target_link_libraries(euclid PRIVATE ${SDL2_LIBRARIES})
+    integrate_cmake_dependency(
+            NAME pigpio
+            GIT_URL git@github.com:joan2937/pigpio.git
+            GIT_TAG c33738a320a3e28824af7807edafda440952c05d
+    )
+    target_include_directories(euclid PRIVATE ${CMAKE_BINARY_DIR}/pigpio-src)
+    target_link_libraries(euclid PRIVATE pigpio)
+endif ()
+
+
+##########
+### tyr ##
+##########
+if (tyr)
+    message("(~) building for tyr")
+    add_compile_definitions(TYR WAVELET)
     find_package(SDL2 REQUIRED)
     include_directories(euclid ${SDL2_INCLUDE_DIRS})
     target_link_libraries(euclid PRIVATE ${SDL2_LIBRARIES})

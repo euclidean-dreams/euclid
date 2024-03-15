@@ -7,8 +7,10 @@
 #include "cosmology.h"
 
 #ifdef OPUS
+
 #include "optics/opus.h"
 #include "input/fascia.h"
+
 #endif
 #ifdef WAVELET
 #include "optics/wavelet.h"
@@ -34,6 +36,7 @@ up<Opus> opus;
 up<Fascia> fascia;
 SDL_Window *window;
 SDL_Renderer *renderer;
+int canvas_pixel_stretch;
 #endif
 #ifdef WAVELET
 up<Wavelet> wavelet;
@@ -103,7 +106,15 @@ void bootstrap() {
     render_width = 1470;
     render_height = 956;
 #endif
+#ifdef WAMULATOR
+    render_width = 64 * canvas_pixel_stretch;
+    render_height = 64 * canvas_pixel_stretch;
+#endif
 #ifdef SJOFN
+    render_width = 64;
+    render_height = 64;
+#endif
+#ifdef TYR
     render_width = 64;
     render_height = 64;
 #endif
@@ -118,7 +129,13 @@ void bootstrap() {
     spdlog::info("(~) acoustics");
 
     spdlog::info("( ) cosmology");
-    cosmos = mkup<Cosmology>(render_width, render_height, STFT_SIZE);
+    auto cosmology_width = render_width;
+    auto cosmology_height = render_height;
+#ifdef WAMULATOR
+    cosmology_width = render_width / canvas_pixel_stretch;
+    cosmology_height = render_height / canvas_pixel_stretch;
+#endif
+    cosmos = mkup<Cosmology>(cosmology_width, cosmology_height, STFT_SIZE);
     spdlog::info("(~) cosmology");
 
     spdlog::info("( ) optics");
@@ -137,6 +154,10 @@ void bootstrap() {
     );
     Uint32 rendererFlags = SDL_RENDERER_ACCELERATED;
     renderer = SDL_CreateRenderer(window, -1, rendererFlags);
+    canvas_pixel_stretch = 1;
+#ifdef WAMULATOR
+    canvas_pixel_stretch = 3;
+#endif
     spdlog::info("(~) renderer");
     opus = mkup<Opus>();
     fascia = mkup<Fascia>(*equalizer);
