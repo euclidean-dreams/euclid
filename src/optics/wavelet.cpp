@@ -10,7 +10,7 @@
 
 namespace euclid {
 
-SPIConnection::SPIConnection(sp<Arbiter<Lattice>> observation_arbiter)
+SPIConnection::SPIConnection(sptr<Arbiter<Lattice>> observation_arbiter)
         : send_buffer{},
           observation_arbiter{mv(observation_arbiter)} {
     spdlog::info("( ) spi connection");
@@ -80,8 +80,8 @@ uint64_t SPIConnection::get_tick_interval() {
 
 Wavelet::Wavelet() :
         observation_arbiter{} {
-    observation_arbiter = mksp<Arbiter<Lattice>>();
-    auto spi_connection = mkup<SPIConnection>(observation_arbiter);
+    observation_arbiter = mksptr<Arbiter<Lattice>>();
+    auto spi_connection = mkuptr<SPIConnection>(observation_arbiter);
     spi_thread = Circlet::begin(mv(spi_connection));
 }
 

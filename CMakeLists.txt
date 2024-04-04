@@ -1,7 +1,7 @@
 ##########
 ## Init ##
 ##########
-cmake_minimum_required(VERSION 3.23)
+cmake_minimum_required(VERSION 3.18)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 project(euclid)
@@ -19,6 +19,7 @@ option(mac "build for your mac" OFF)
 option(wamulator "build for your wavelet emulator" OFF)
 option(sjofn "build for sjofn" OFF)
 option(tyr "build for tyr" OFF)
+option(castor "build for castor" OFF)
 
 
 ############
@@ -51,14 +52,7 @@ if (mac OR wamulator)
             src/input/fascia.cpp src/input/fascia.h
     )
 endif ()
-if (sjofn)
-    set(
-            SOURCE_FILES
-            ${SOURCE_FILES}
-            src/optics/wavelet.cpp src/optics/wavelet.h
-    )
-endif ()
-if (tyr)
+if (sjofn OR tyr OR castor)
     set(
             SOURCE_FILES
             ${SOURCE_FILES}
@@ -107,35 +101,16 @@ if (mac OR wamulator)
     target_link_libraries(euclid PRIVATE ${SDL2_LIBRARIES})
     include_directories(euclid /opt/homebrew/Cellar/sdl2_ttf/2.22.0/include)
     target_link_libraries(euclid PUBLIC /opt/homebrew/Cellar/sdl2_ttf/2.22.0/lib/libSDL2_ttf.dylib)
-    target_link_libraries(euclid PUBLIC /opt/homebrew/Cellar/fmt/10.2.1/lib/libfmt.dylib)
+    target_link_libraries(euclid PUBLIC /opt/homebrew/Cellar/fmt/10.2.1_1/lib/libfmt.dylib)
 endif ()
 
 
-############
-### sjofn ##
-############
-if (sjofn)
-    message("(~) building for sjofn")
-    add_compile_definitions(SJOFN WAVELET)
-    find_package(SDL2 REQUIRED)
-    include_directories(euclid ${SDL2_INCLUDE_DIRS})
-    target_link_libraries(euclid PRIVATE ${SDL2_LIBRARIES})
-    integrate_cmake_dependency(
-            NAME pigpio
-            GIT_URL git@github.com:joan2937/pigpio.git
-            GIT_TAG c33738a320a3e28824af7807edafda440952c05d
-    )
-    target_include_directories(euclid PRIVATE ${CMAKE_BINARY_DIR}/pigpio-src)
-    target_link_libraries(euclid PRIVATE pigpio)
-endif ()
-
-
-##########
-### tyr ##
-##########
-if (tyr)
-    message("(~) building for tyr")
-    add_compile_definitions(TYR WAVELET)
+###############
+### pantheon ##
+###############
+if (sjofn OR tyr OR castor)
+    message("(~) building for pantheon")
+    add_compile_definitions(PANTHEON WAVELET)
     find_package(SDL2 REQUIRED)
     include_directories(euclid ${SDL2_INCLUDE_DIRS})
     target_link_libraries(euclid PRIVATE ${SDL2_LIBRARIES})

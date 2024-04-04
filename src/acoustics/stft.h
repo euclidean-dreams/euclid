@@ -22,7 +22,7 @@ private:
     vec<float> fft_input{};
     vec<kiss_fft_cpx> fft_output{};
     kiss_fftr_cfg fft_plan = kiss_fftr_alloc(fft_size, 0, nullptr, nullptr);
-    lst<up<Signal<float>>> input_signals{};
+    lst<uptr<Signal<float>>> input_signals{};
 
     float hamming_window(int sample_number) const {
         return static_cast<float>(0.53836 - 0.46164 * std::cos((2 * M_PI * sample_number) / (fft_size - 1)));
@@ -42,7 +42,7 @@ public:
         kiss_fft_free(fft_plan);
     }
 
-    up<Signal<cmplx>> stft(up<Signal<float>> signal) {
+    uptr<Signal<cmplx>> stft(uptr<Signal<float>> signal) {
         if (input_signals.size() < window_size / hop_size) {
             // waiting for enough input signals to operate on...
             input_signals.push_back(mv(signal));
@@ -70,7 +70,7 @@ public:
 
         // perform the actual fft
         kiss_fftr(fft_plan, fft_input.data(), fft_output.data());
-        auto result = mkup<Signal<cmplx>>();
+        auto result = mkuptr<Signal<cmplx>>();
         for (int i = 0; i < stft_size; i++) {
             result->push_back({fft_output[i].r, fft_output[i].i});
         }

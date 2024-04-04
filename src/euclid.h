@@ -27,34 +27,43 @@ int render_width;
 int render_height;
 bool running = true;
 
-up<SDLAudioInput> audio_input;
-up<Equalizer> equalizer;
-up<FourierTransform> fourier_transform;
-up<Cosmology> cosmos;
+uptr<SDLAudioInput> audio_input;
+uptr<Equalizer> equalizer;
+uptr<FourierTransform> fourier_transform;
+uptr<Cosmology> cosmos;
 #ifdef OPUS
-up<Opus> opus;
-up<Fascia> fascia;
+uptr<Opus> opus;
+uptr<Fascia> fascia;
 SDL_Window *window;
 SDL_Renderer *renderer;
 int canvas_pixel_stretch;
 #endif
 #ifdef WAVELET
-up<Wavelet> wavelet;
+uptr<Wavelet> wavelet;
 #endif
 
 uint64_t last_render_time = 0;
 
 class Euclid : public Name {
 private:
+    bool already_logged_first_audio_signal = false;
+
     void process_input() {
         auto audio = audio_input->ring_buffer.get_next_signal();
+        if (not already_logged_first_audio_signal) {
+            spdlog::info("received first audio signal:");
+            spdlog::info("    {}, {}, {}, {}, {}, {}, {}",
+                         audio->get_sample(0), audio->get_sample(1), audio->get_sample(2), audio->get_sample(3),
+                         audio->get_sample(4), audio->get_sample(5), audio->get_sample(6));
+            already_logged_first_audio_signal = true;
+        }
         auto equalized = equalizer->equalize(mv(audio));
         auto stft = fourier_transform->stft(mv(equalized));
         if (stft == nullptr) {
             return;
         }
 
-        auto stft_magnitudes = mksp<Signal<float>>();
+        auto stft_magnitudes = mksptr<Signal<float>>();
         for (auto &sample: *stft) {
             auto magnitude = scast<float>(std::sqrt(std::pow(sample.real(), 2) + std::pow(sample.imag(), 2)));
             stft_magnitudes->push_back(magnitude);
@@ -87,7 +96,7 @@ public:
     }
 };
 
-up<Euclid> euclid;
+uptr<Euclid> euclid;
 
 void tick() {
     euclid->activate();
@@ -95,7 +104,7 @@ void tick() {
 
 void bootstrap() {
     spdlog::info("( ) Initializing euclid");
-    euclid = mkup<Euclid>();
+    euclid = mkuptr<Euclid>();
 
     spdlog::info("( ) dimensions");
 #ifdef WASM
@@ -110,11 +119,7 @@ void bootstrap() {
     render_width = 64 * canvas_pixel_stretch;
     render_height = 64 * canvas_pixel_stretch;
 #endif
-#ifdef SJOFN
-    render_width = 64;
-    render_height = 64;
-#endif
-#ifdef TYR
+#ifdef PANTHEON
     render_width = 64;
     render_height = 64;
 #endif
@@ -123,9 +128,9 @@ void bootstrap() {
 
     spdlog::info("( ) acoustics");
     SDL_Init(SDL_INIT_AUDIO);
-    audio_input = mkup<SDLAudioInput>(FRAME_SIZE);
-    equalizer = mkup<Equalizer>();
-    fourier_transform = mkup<FourierTransform>();
+    audio_input = mkuptr<SDLAudioInput>(FRAME_SIZE);
+    equalizer = mkuptr<Equalizer>();
+    fourier_transform = mkuptr<FourierTransform>();
     spdlog::info("(~) acoustics");
 
     spdlog::info("( ) cosmology");
@@ -135,7 +140,7 @@ void bootstrap() {
     cosmology_width = render_width / canvas_pixel_stretch;
     cosmology_height = render_height / canvas_pixel_stretch;
 #endif
-    cosmos = mkup<Cosmology>(cosmology_width, cosmology_height, STFT_SIZE);
+    cosmos = mkuptr<Cosmology>(cosmology_width, cosmology_height, STFT_SIZE);
     spdlog::info("(~) cosmology");
 
     spdlog::info("( ) optics");
@@ -159,11 +164,11 @@ void bootstrap() {
     canvas_pixel_stretch = 3;
 #endif
     spdlog::info("(~) renderer");
-    opus = mkup<Opus>();
-    fascia = mkup<Fascia>(*equalizer);
+    opus = mkuptr<Opus>();
+    fascia = mkuptr<Fascia>(*equalizer);
 #endif
 #ifdef WAVELET
-    wavelet = mkup<Wavelet>();
+    wavelet = mkuptr<Wavelet>();
 #endif
     spdlog::info("(~) optics");
     spdlog::info("(~) Initialized euclid");

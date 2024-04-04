@@ -52,8 +52,8 @@ public:
         }
     }
 
-    up<Signal<float>> get_next_signal() {
-        auto signal = mkup<Signal<float>>();
+    uptr<Signal<float>> get_next_signal() {
+        auto signal = mkuptr<Signal<float>>();
         for (int i = 0; i < signal_size; i++) {
             signal->push_back(*read_iterator);
             read_iterator++;

@@ -26,6 +26,13 @@ public:
         }
         desired_spec.callback = recording_callback;
         desired_spec.userdata = &ring_buffer;
+
+        int device_count = SDL_GetNumAudioDevices(1);
+        spdlog::info("-- enumerating {} audio device(s) --", device_count);
+        for (int device_index = 0; device_index < device_count; ++device_index) {
+            const char *device_name = SDL_GetAudioDeviceName(device_index, 1);
+            spdlog::info("    name: {}, index: {}", device_name, device_index);
+        }
         auto audio_device = SDL_OpenAudioDevice(nullptr, 1, &desired_spec, &actual_spec, 0);
         SDL_PauseAudioDevice(audio_device, SDL_FALSE);
     }

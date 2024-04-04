@@ -56,8 +56,8 @@ void Fascia::handle_events() {
     }
 }
 
-up<Canvas> Fascia::observe() {
-    auto canvas = mkup<Canvas>(render_width, render_height);
+uptr<Canvas> Fascia::observe() {
+    auto canvas = mkuptr<Canvas>(render_width, render_height);
     if (display_fascia) {
         auto horizontal_offset = render_width / 88;
         auto vertical_offset_increment = render_height / 22;

@@ -12,10 +12,7 @@ private:
 #ifdef MAC
     float gain = 10.0;
 #endif
-#ifdef SJOFN
-    float gain = 12.0;
-#endif
-#ifdef TYR
+#ifdef PANTHEON
     float gain = 12.0;
 #endif
 
@@ -25,8 +22,8 @@ public:
         if (gain < 0) gain = 0.01;
     }
 
-    up<Signal<float>> equalize(up<Signal<float>> origin) {
-        auto output = mkup<Signal<float>>();
+    uptr<Signal<float>> equalize(uptr<Signal<float>> origin) {
+        auto output = mkuptr<Signal<float>>();
         for (auto &sample: *origin) {
             output->push_back(sample * gain);
         }

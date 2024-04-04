@@ -22,7 +22,7 @@ public:
 
     void handle_events();
 
-    up<Canvas> observe();
+    uptr<Canvas> observe();
 };
 
 }

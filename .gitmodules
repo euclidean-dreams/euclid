@@ -5,3 +5,6 @@
 [submodule "lib/cmake-utils"]
 	path = lib/cmake-utils
 	url = git@github.com:euclidean-dreams/cmake-utils.git
+[submodule "lib/perception"]
+	path = lib/perception
+	url = git@github.com:euclidean-dreams/perception.git

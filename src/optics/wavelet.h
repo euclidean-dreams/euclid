@@ -8,12 +8,12 @@ class SPIConnection : public Circlet {
 private:
     std::vector<char> send_buffer;
     int spi_handle;
-    sp<Arbiter<Lattice>> observation_arbiter;
+    sptr<Arbiter<Lattice>> observation_arbiter;
 
     void send(const unsigned char *data);
 
 public:
-    SPIConnection(sp<Arbiter<Lattice>> observation_arbiter);
+    SPIConnection(sptr<Arbiter<Lattice>> observation_arbiter);
 
     void activate() override;
 
@@ -22,13 +22,13 @@ public:
 
 class Wavelet : public Name {
 private:
-    sp<Arbiter<Lattice>> observation_arbiter;
-    up<std::thread> spi_thread;
+    sptr<Arbiter<Lattice>> observation_arbiter;
+    uptr<std::thread> spi_thread;
 
 public:
     Wavelet();
 
-    void send(up<Lattice> lattice);
+    void send(uptr<Lattice> lattice);
 
 };
 
