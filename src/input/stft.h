@@ -1,9 +1,7 @@
 #pragma once
 
-#include <complex>
-#include <list>
+#include "axioms.h"
 #include "kiss_fftr.h"
-#include "paradigm.h"
 
 namespace euclid {
 
@@ -14,14 +12,14 @@ enum class WindowFunction {
 
 class FourierTransform : public Name {
 private:
-    WindowFunction window_function = WindowFunction::hamming;
+    WindowFunction window_function;
     int hop_size = 1;
     int window_size = 32;
-    int fft_size = window_size * FRAME_SIZE;
-    int stft_size = fft_size / 2 + 1;
+    int fft_size;
+    int stft_size;
     vec<float> fft_input{};
     vec<kiss_fft_cpx> fft_output{};
-    kiss_fftr_cfg fft_plan = kiss_fftr_alloc(fft_size, 0, nullptr, nullptr);
+    kiss_fftr_cfg fft_plan;
     lst<uptr<Signal<float>>> input_signals{};
 
     float hamming_window(int sample_number) const {
@@ -33,7 +31,11 @@ private:
     }
 
 public:
-    FourierTransform() {
+    FourierTransform(int frame_size, WindowFunction window_function)
+            : window_function{window_function},
+              fft_size{window_size * frame_size},
+              stft_size{fft_size / 2 + 1},
+              fft_plan(kiss_fftr_alloc(fft_size, 0, nullptr, nullptr)) {
         fft_input.resize(fft_size);
         fft_output.resize(fft_size);
     }

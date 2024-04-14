@@ -1,7 +1,7 @@
 #pragma once
 
 #include "paradigm.h"
-#include "ring_buffer.h"
+#include "perception/ring_buffer.h"
 
 namespace euclid {
 

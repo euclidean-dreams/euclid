@@ -31,10 +31,8 @@ set(
         src/euclid.h
         src/paradigm.h
 
-        src/acoustics/audio_input.h
-        src/acoustics/equalizer.h
-        src/acoustics/ring_buffer.h
-        src/acoustics/stft.h
+        src/input/audio_input.h
+        src/input/stft.h
 )
 if (wasm)
     set(

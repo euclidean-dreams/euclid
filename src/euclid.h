@@ -1,9 +1,9 @@
 #pragma once
 
 #include "paradigm.h"
-#include "acoustics/audio_input.h"
-#include "acoustics/stft.h"
-#include "acoustics/equalizer.h"
+#include "input/audio_input.h"
+#include "input/stft.h"
+#include "perception/equalizer.h"
 #include "cosmology.h"
 
 #ifdef OPUS
@@ -127,10 +127,19 @@ void bootstrap() {
     spdlog::info("(~) dimensions");
 
     spdlog::info("( ) acoustics");
+#ifdef WASM
+    float gain = 10.0;
+#endif
+#ifdef MAC
+    float gain = 10.0;
+#endif
+#ifdef PANTHEON
+    float gain = 12.0;
+#endif
     SDL_Init(SDL_INIT_AUDIO);
     audio_input = mkuptr<SDLAudioInput>(FRAME_SIZE);
-    equalizer = mkuptr<Equalizer>();
-    fourier_transform = mkuptr<FourierTransform>();
+    equalizer = mkuptr<Equalizer>(gain);
+    fourier_transform = mkuptr<FourierTransform>(FRAME_SIZE, WindowFunction::hamming);
     spdlog::info("(~) acoustics");
 
     spdlog::info("( ) cosmology");

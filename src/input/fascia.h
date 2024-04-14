@@ -2,7 +2,7 @@
 
 #include "paradigm.h"
 #include "optics/opus.h"
-#include "acoustics/equalizer.h"
+#include "perception/equalizer.h"
 #include <SDL2/SDL_ttf.h>
 
 namespace euclid {
