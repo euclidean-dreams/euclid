@@ -6,7 +6,6 @@ namespace euclid {
 
 extern SDL_Window *window;
 extern SDL_Renderer *renderer;
-extern int canvas_pixel_stretch;
 
 
 class Canvas : public Name {

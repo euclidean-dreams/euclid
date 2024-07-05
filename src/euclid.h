@@ -63,7 +63,6 @@ uptr<Fascia> fascia;
 uptr<Opus> opus;
 SDL_Window *window;
 SDL_Renderer *renderer;
-int canvas_pixel_stretch;
 #endif
 #ifdef QUETZAL
 uptr<QuetzalOutput> quetzal_output;
@@ -139,18 +138,9 @@ void bootstrap() {
 #ifdef WASM
     render_width = EM_ASM_INT(return screen.width);
     render_height = EM_ASM_INT(return screen.height);
-#endif
-#ifdef MAC
-    render_width = 1470;
-    render_height = 956;
-#endif
-#ifdef WAMULATOR
-    render_width = 64 * canvas_pixel_stretch;
-    render_height = 64 * canvas_pixel_stretch;
-#endif
-#ifdef QUETZAL
-    render_width = 64;
-    render_height = 64;
+#else
+    render_width = COMPILED_RENDER_WIDTH;
+    render_height = COMPILED_RENDER_HEIGHT;
 #endif
     spdlog::info("render_width {}, render_height: {}", render_width, render_height);
     spdlog::info("(~) dimensions");
@@ -177,13 +167,7 @@ void bootstrap() {
     spdlog::info("(~) acoustics");
 
     spdlog::info("( ) cosmology");
-    auto cosmology_width = render_width;
-    auto cosmology_height = render_height;
-#ifdef WAMULATOR
-    cosmology_width = render_width / canvas_pixel_stretch;
-    cosmology_height = render_height / canvas_pixel_stretch;
-#endif
-    cosmos = mkuptr<Cosmology>(cosmology_width, cosmology_height, STFT_SIZE);
+    cosmos = mkuptr<Cosmology>(render_width, render_height, STFT_SIZE);
     spdlog::info("(~) cosmology");
 
     spdlog::info("( ) optics");
@@ -202,10 +186,6 @@ void bootstrap() {
     );
     Uint32 rendererFlags = SDL_RENDERER_ACCELERATED;
     renderer = SDL_CreateRenderer(window, -1, rendererFlags);
-    canvas_pixel_stretch = 1;
-#ifdef WAMULATOR
-    canvas_pixel_stretch = 3;
-#endif
     spdlog::info("(~) renderer");
     opus = mkuptr<Opus>();
 #endif

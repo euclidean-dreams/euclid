@@ -45,10 +45,11 @@ Canvas::Canvas(Lattice &lattice) :
         auto coordinate = dot.first;
         auto color = dot.second;
         auto surface_color = SDL_MapRGBA(surface->format, color.red, color.green, color.blue, 255);
-        auto initial_y = coordinate.y * canvas_pixel_stretch;
-        for (int y = initial_y; y < initial_y + canvas_pixel_stretch; y++) {
-            auto initial_x = coordinate.x * canvas_pixel_stretch;
-            for (int x = initial_x; x < initial_x + canvas_pixel_stretch; x++) {
+        int stretch = 1;
+        auto initial_y = coordinate.y * stretch;
+        for (int y = initial_y; y < initial_y + stretch; y++) {
+            auto initial_x = coordinate.x * stretch;
+            for (int x = initial_x; x < initial_x + stretch; x++) {
                 auto pixel_index = render_width * (render_height - 1 - y) + x;
                 pixels[pixel_index] = surface_color;
             }

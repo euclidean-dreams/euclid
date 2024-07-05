@@ -16,9 +16,22 @@ option(debug "debug" OFF)
 # pick one!
 option(wasm "build for the web" OFF)
 option(mac "build for a mac" OFF)
-option(wamulator "build for your wavelet emulator" OFF)
 option(quetzal "build for a quetzal" OFF)
 
+# render width and height
+if (wasm)
+    # set automatically by the browser
+    add_compile_definitions(COMPILED_RENDER_WIDTH=-1)
+    add_compile_definitions(COMPILED_RENDER_HEIGHT=-1)
+elseif (mac)
+    add_compile_definitions(COMPILED_RENDER_WIDTH=1470)
+    add_compile_definitions(COMPILED_RENDER_HEIGHT=956)
+elseif (quetzal)
+    set(RENDER_WIDTH 64 CACHE STRING "width of the output frame")
+    set(RENDER_HEIGHT 64 CACHE STRING "height of the output frame")
+    add_compile_definitions(COMPILED_RENDER_WIDTH=${RENDER_WIDTH})
+    add_compile_definitions(COMPILED_RENDER_HEIGHT=${RENDER_HEIGHT})
+endif ()
 
 ############
 ## source ##
@@ -38,7 +51,7 @@ if (wasm)
             src/acoustics/kiss_fft.h
     )
 endif ()
-if (mac OR wamulator)
+if (mac)
     set(
             SOURCE_FILES
             ${SOURCE_FILES}
@@ -89,12 +102,9 @@ endif ()
 ##########
 ### mac ##
 ##########
-if (mac OR wamulator)
+if (mac)
     message("(~) building for your mac")
     add_compile_definitions(MAC OPUS SDL_AUDIO)
-    if (wamulator)
-        add_compile_definitions(WAMULATOR)
-    endif ()
     set(CMAKE_PREFIX_PATH /opt/homebrew/lib)
     find_package(SDL2 REQUIRED)
     include_directories(euclid ${SDL2_INCLUDE_DIRS})
@@ -152,7 +162,7 @@ if (wasm)
     )
     target_link_libraries(euclid PRIVATE kissfft)
     add_compile_definitions(KISS_FFT)
-elseif (wamulator OR mac OR quetzal)
+elseif (mac OR quetzal)
     find_package(KFR CONFIG REQUIRED)
     target_link_libraries(euclid PRIVATE kfr kfr_dft)
     add_compile_definitions(KFR_FFT)
