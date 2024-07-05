@@ -1,7 +1,7 @@
 [submodule "lib/cosmology"]
-	path = lib/cosmology
+	save_directory = lib/cosmology
 	url = git@github.com:euclidean-dreams/cosmology.git
 
 [submodule "lib/cmake-utils"]
-	path = lib/cmake-utils
+	save_directory = lib/cmake-utils
 	url = git@github.com:euclidean-dreams/cmake-utils.git
