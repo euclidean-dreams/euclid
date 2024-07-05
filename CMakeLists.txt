@@ -15,9 +15,9 @@ option(debug "debug" OFF)
 
 # pick one!
 option(wasm "build for the web" OFF)
-option(mac "build for your mac" OFF)
+option(mac "build for a mac" OFF)
 option(wamulator "build for your wavelet emulator" OFF)
-option(pi "build for a raspberry pi" OFF)
+option(quetzal "build for a quetzal" OFF)
 
 
 ############
@@ -50,11 +50,11 @@ if (mac OR wamulator)
             src/optics/save_png.h
     )
 endif ()
-if (pi)
+if (quetzal)
     set(
             SOURCE_FILES
             ${SOURCE_FILES}
-            src/optics/wavelet.cpp src/optics/wavelet.h
+            src/optics/quetzal_output.cpp src/optics/quetzal_output.h
             src/acoustics/portaudio_input.h
             src/acoustics/kfr_fft.h
 
@@ -105,12 +105,12 @@ if (mac OR wamulator)
 endif ()
 
 
-###################
-### raspberry pi ##
-###################
-if (pi)
-    message("(~) building for raspberry pi")
-    add_compile_definitions(RASPI WAVELET PORT_AUDIO)
+##############
+### quetzal ##
+##############
+if (quetzal)
+    message("(~) building for quetzal")
+    add_compile_definitions(QUETZAL PORT_AUDIO)
     target_link_libraries(euclid PRIVATE pigpio)
     target_link_libraries(euclid PRIVATE portaudio)
 endif ()
@@ -152,7 +152,7 @@ if (wasm)
     )
     target_link_libraries(euclid PRIVATE kissfft)
     add_compile_definitions(KISS_FFT)
-elseif (wamulator OR mac OR pi)
+elseif (wamulator OR mac OR quetzal)
     find_package(KFR CONFIG REQUIRED)
     target_link_libraries(euclid PRIVATE kfr kfr_dft)
     add_compile_definitions(KFR_FFT)

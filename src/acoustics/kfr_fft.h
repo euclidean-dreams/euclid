@@ -5,7 +5,7 @@
 #include <kfr/dsp/window.hpp>
 
 namespace euclid {
-#ifdef WAVELET
+#ifdef QUETZAL
 #define WINDOW_SIZE 1
 #else
 #define WINDOW_SIZE 8

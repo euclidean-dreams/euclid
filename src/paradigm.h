@@ -3,7 +3,7 @@
 #include <spdlog/spdlog.h>
 #include "axioms.h"
 
-#ifndef RASPI
+#ifndef QUETZAL
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <SDL2/SDL.h>

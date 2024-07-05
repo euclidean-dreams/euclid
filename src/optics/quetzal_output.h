@@ -20,16 +20,15 @@ public:
     uint64_t get_tick_interval() override;
 };
 
-class Wavelet : public Name {
+class QuetzalOutput : public Name {
 private:
     sptr<Arbiter<Lattice>> observation_arbiter;
     uptr<std::thread> spi_thread;
 
 public:
-    Wavelet();
+    QuetzalOutput();
 
     void send(uptr<Lattice> lattice);
-
 };
 
 }

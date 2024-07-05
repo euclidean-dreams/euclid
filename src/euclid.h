@@ -32,9 +32,9 @@
 #include "interaction/fascia.h"
 
 #endif
-#ifdef WAVELET
+#ifdef QUETZAL
 
-#include "optics/wavelet.h"
+#include "optics/quetzal_output.h"
 
 #endif
 
@@ -65,8 +65,8 @@ SDL_Window *window;
 SDL_Renderer *renderer;
 int canvas_pixel_stretch;
 #endif
-#ifdef WAVELET
-uptr<Wavelet> wavelet;
+#ifdef QUETZAL
+uptr<QuetzalOutput> quetzal_output;
 #endif
 
 uint64_t last_render_time = 0;
@@ -118,8 +118,8 @@ public:
 #endif
             opus->render();
 #endif
-#ifdef WAVELET
-            wavelet->send(mv(lattice));
+#ifdef QUETZAL
+            quetzal_output->send(mv(lattice));
 #endif
         }
     }
@@ -148,7 +148,7 @@ void bootstrap() {
     render_width = 64 * canvas_pixel_stretch;
     render_height = 64 * canvas_pixel_stretch;
 #endif
-#ifdef RASPI
+#ifdef QUETZAL
     render_width = 64;
     render_height = 64;
 #endif
@@ -162,7 +162,7 @@ void bootstrap() {
 #ifdef MAC
     float gain = 1.0;
 #endif
-#ifdef RASPI
+#ifdef QUETZAL
     float gain = 12.0;
 #endif
 #ifdef SDL_AUDIO
@@ -212,8 +212,8 @@ void bootstrap() {
 #ifdef MAC
     fascia = mkuptr<Fascia>(*equalizer);
 #endif
-#ifdef WAVELET
-    wavelet = mkuptr<Wavelet>();
+#ifdef QUETZAL
+    quetzal_output = mkuptr<QuetzalOutput>();
 #endif
     spdlog::info("(~) optics");
     spdlog::info("(~) Initialized euclid");
