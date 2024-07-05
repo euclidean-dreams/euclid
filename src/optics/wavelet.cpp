@@ -4,7 +4,7 @@
 #define HEADER_SIZE 4
 #define LED_COUNT (render_width * render_height)
 #define PACKET_SIZE (HEADER_SIZE + LED_COUNT * 3)
-#define BAUDRATE (1 * 1000 * 1000)
+#define BAUDRATE (2 * 1000 * 1000)
 #define FRAME_RATE 16000
 #define BRIGHTNESS 100
 
@@ -28,7 +28,7 @@ SPIConnection::SPIConnection(sptr<Arbiter<Lattice>> observation_arbiter)
     }
 
     spdlog::info("offering SPI salutation!");
-    vec<unsigned char> salutation;
+    vect<unsigned char> salutation;
     salutation.reserve(PACKET_SIZE);
     salutation.push_back(BRIGHTNESS);
     salutation.push_back(0);
@@ -54,7 +54,7 @@ void SPIConnection::send(const unsigned char *data) {
 void SPIConnection::activate() {
     if (observation_arbiter->ready()) {
         auto lattice = observation_arbiter->take();
-        vec<unsigned char> new_data;
+        vect<unsigned char> new_data;
         new_data.reserve(PACKET_SIZE);
 
         // header

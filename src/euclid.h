@@ -1,39 +1,66 @@
 #pragma once
 
 #include "paradigm.h"
-#include "input/audio_input.h"
-#include "input/stft.h"
 #include "perception/equalizer.h"
 #include "cosmology.h"
 
+#ifdef KFR_FFT
+
+#include "acoustics/kfr_fft.h"
+
+#endif
+#ifdef KISS_FFT
+#include "acoustics/kiss_fft.h"
+#endif
+
+// acoustics
+#ifdef SDL_AUDIO
+
+#include "acoustics/sdl_input.h"
+
+#endif
+#ifdef PORT_AUDIO
+
+#include "acoustics/portaudio_input.h"
+
+#endif
+
+// optics
 #ifdef OPUS
 
 #include "optics/opus.h"
-#include "input/fascia.h"
+#include "interaction/fascia.h"
 
 #endif
 #ifdef WAVELET
+
 #include "optics/wavelet.h"
+
 #endif
 
 namespace euclid {
-
-// power of 2 >= 256
-int FRAME_SIZE = 256;
-int STFT_SIZE = (32 * FRAME_SIZE) / 2 + 1;
 
 int RENDER_TICK_INTERVAL = 9000;
 int render_width;
 int render_height;
 bool running = true;
 
-uptr<SDLAudioInput> audio_input;
 uptr<Equalizer> equalizer;
 uptr<FourierTransform> fourier_transform;
 uptr<Cosmology> cosmos;
+#ifdef SDL_AUDIO
+uptr<SDLAudioInput> audio_input;
+#endif
+#ifdef PORT_AUDIO
+uptr<PortaudioInput> audio_input;
+#endif
+
+#ifdef MAC
+uptr<Fascia> fascia;
+#endif
+
 #ifdef OPUS
 uptr<Opus> opus;
-uptr<Fascia> fascia;
 SDL_Window *window;
 SDL_Renderer *renderer;
 int canvas_pixel_stretch;
@@ -84,10 +111,12 @@ public:
                 Canvas canvas{*lattice};
                 opus->blit(canvas.finalize(), canvas.area);
             }
+#ifdef MAC
             auto canvas = fascia->observe();
             opus->blit(canvas->finalize(), canvas->area);
-            opus->render();
             fascia->handle_events();
+#endif
+            opus->render();
 #endif
 #ifdef WAVELET
             wavelet->send(mv(lattice));
@@ -119,7 +148,7 @@ void bootstrap() {
     render_width = 64 * canvas_pixel_stretch;
     render_height = 64 * canvas_pixel_stretch;
 #endif
-#ifdef PANTHEON
+#ifdef RASPI
     render_width = 64;
     render_height = 64;
 #endif
@@ -128,18 +157,23 @@ void bootstrap() {
 
     spdlog::info("( ) acoustics");
 #ifdef WASM
-    float gain = 10.0;
+    float gain = 1.0;
 #endif
 #ifdef MAC
-    float gain = 10.0;
+    float gain = 1.0;
 #endif
-#ifdef PANTHEON
+#ifdef RASPI
     float gain = 12.0;
 #endif
+#ifdef SDL_AUDIO
     SDL_Init(SDL_INIT_AUDIO);
     audio_input = mkuptr<SDLAudioInput>(FRAME_SIZE);
+#endif
+#ifdef PORT_AUDIO
+    audio_input = mkuptr<PortaudioInput>(FRAME_SIZE);
+#endif
     equalizer = mkuptr<Equalizer>(gain);
-    fourier_transform = mkuptr<FourierTransform>(FRAME_SIZE, WindowFunction::hamming);
+    fourier_transform = mkuptr<FourierTransform>();
     spdlog::info("(~) acoustics");
 
     spdlog::info("( ) cosmology");
@@ -174,6 +208,8 @@ void bootstrap() {
 #endif
     spdlog::info("(~) renderer");
     opus = mkuptr<Opus>();
+#endif
+#ifdef MAC
     fascia = mkuptr<Fascia>(*equalizer);
 #endif
 #ifdef WAVELET

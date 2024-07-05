@@ -61,7 +61,7 @@ uptr<Canvas> Fascia::observe() {
     if (display_fascia) {
         auto horizontal_offset = render_width / 88;
         auto vertical_offset_increment = render_height / 22;
-        vec<std::string> lines;
+        vect<std::string> lines;
         lines.push_back("Knobs and Dials:");
         lines.push_back("[q|a] gain ~ " + std::to_string(equalizer.get_gain()));
         lines.push_back("[w|s] movement ~ " + std::to_string(MOVEMENT));

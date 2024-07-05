@@ -29,7 +29,7 @@ public:
 
         int device_count = SDL_GetNumAudioDevices(1);
         spdlog::info("-- enumerating {} audio device(s) --", device_count);
-        for (int device_index = 0; device_index < device_count; ++device_index) {
+        for (int device_index = 0; device_index < device_count; device_index++) {
             const char *device_name = SDL_GetAudioDeviceName(device_index, 1);
             spdlog::info("    name: {}, index: {}", device_name, device_index);
         }

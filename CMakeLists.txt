@@ -17,9 +17,7 @@ option(debug "debug" OFF)
 option(wasm "build for the web" OFF)
 option(mac "build for your mac" OFF)
 option(wamulator "build for your wavelet emulator" OFF)
-option(sjofn "build for sjofn" OFF)
-option(tyr "build for tyr" OFF)
-option(castor "build for castor" OFF)
+option(pi "build for a raspberry pi" OFF)
 
 
 ############
@@ -30,16 +28,14 @@ set(
         src/main.cpp
         src/euclid.h
         src/paradigm.h
-
-        src/input/audio_input.h
-        src/input/stft.h
 )
 if (wasm)
     set(
             SOURCE_FILES
             ${SOURCE_FILES}
             src/optics/opus.cpp src/optics/opus.h
-            src/input/fascia.cpp src/input/fascia.h
+            src/acoustics/sdl_input.h
+            src/acoustics/kiss_fft.h
     )
 endif ()
 if (mac OR wamulator)
@@ -47,14 +43,21 @@ if (mac OR wamulator)
             SOURCE_FILES
             ${SOURCE_FILES}
             src/optics/opus.cpp src/optics/opus.h
-            src/input/fascia.cpp src/input/fascia.h
+            src/interaction/fascia.cpp src/interaction/fascia.h
+            src/acoustics/sdl_input.h
+            src/acoustics/kiss_fft.h
+            src/optics/lodepng.cpp src/optics/lodepng.h
+            src/optics/save_png.h
     )
 endif ()
-if (sjofn OR tyr OR castor)
+if (pi)
     set(
             SOURCE_FILES
             ${SOURCE_FILES}
             src/optics/wavelet.cpp src/optics/wavelet.h
+            src/acoustics/portaudio_input.h
+            src/acoustics/kfr_fft.h
+
     )
 endif ()
 add_executable(euclid ${SOURCE_FILES})
@@ -67,7 +70,6 @@ target_include_directories(euclid PRIVATE src)
 if (wasm)
     message("(~) building for wasm")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sUSE_SDL=2")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sUSE_SDL_TTF=2")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sALLOW_MEMORY_GROWTH")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sMAXIMUM_MEMORY=4GB")
@@ -80,7 +82,7 @@ if (wasm)
     else ()
         message("(~) [ ] emcc debug")
     endif ()
-    add_compile_definitions(WASM EMSCRIPTEN OPUS)
+    add_compile_definitions(WASM EMSCRIPTEN OPUS SDL_AUDIO)
 endif ()
 
 
@@ -89,7 +91,7 @@ endif ()
 ##########
 if (mac OR wamulator)
     message("(~) building for your mac")
-    add_compile_definitions(MAC OPUS)
+    add_compile_definitions(MAC OPUS SDL_AUDIO)
     if (wamulator)
         add_compile_definitions(WAMULATOR)
     endif ()
@@ -103,22 +105,14 @@ if (mac OR wamulator)
 endif ()
 
 
-###############
-### pantheon ##
-###############
-if (sjofn OR tyr OR castor)
-    message("(~) building for pantheon")
-    add_compile_definitions(PANTHEON WAVELET)
-    find_package(SDL2 REQUIRED)
-    include_directories(euclid ${SDL2_INCLUDE_DIRS})
-    target_link_libraries(euclid PRIVATE ${SDL2_LIBRARIES})
-    integrate_cmake_dependency(
-            NAME pigpio
-            GIT_URL git@github.com:joan2937/pigpio.git
-            GIT_TAG c33738a320a3e28824af7807edafda440952c05d
-    )
-    target_include_directories(euclid PRIVATE ${CMAKE_BINARY_DIR}/pigpio-src)
+###################
+### raspberry pi ##
+###################
+if (pi)
+    message("(~) building for raspberry pi")
+    add_compile_definitions(RASPI WAVELET PORT_AUDIO)
     target_link_libraries(euclid PRIVATE pigpio)
+    target_link_libraries(euclid PRIVATE portaudio)
 endif ()
 
 
@@ -148,11 +142,20 @@ endif ()
 #########
 ## FFT ##
 #########
-SET(KISSFFT_TOOLS OFF)
-SET(KISSFFT_TEST OFF)
-integrate_cmake_dependency(
-        NAME fft
-        GIT_URL git@github.com:mborgerding/kissfft.git
-        GIT_TAG 131.1.0
-)
-target_link_libraries(euclid PRIVATE kissfft)
+if (wasm)
+    SET(KISSFFT_TOOLS OFF)
+    SET(KISSFFT_TEST OFF)
+    integrate_cmake_dependency(
+            NAME fft
+            GIT_URL git@github.com:mborgerding/kissfft.git
+            GIT_TAG 131.1.0
+    )
+    target_link_libraries(euclid PRIVATE kissfft)
+    add_compile_definitions(KISS_FFT)
+elseif (wamulator OR mac OR pi)
+    find_package(KFR CONFIG REQUIRED)
+    target_link_libraries(euclid PRIVATE kfr kfr_dft)
+    add_compile_definitions(KFR_FFT)
+else ()
+    message(FATAL_ERROR "could not resolve fft library for given build options")
+endif ()
