@@ -1,12 +1,11 @@
 #include "quetzal.h"
 #include <pigpio.h>
 
-#define HEADER_SIZE 4
+#define HEADER_SIZE 8
 #define LED_COUNT (render_width * render_height)
-#define PACKET_SIZE (HEADER_SIZE + LED_COUNT * 3)
-#define BAUDRATE (2 * 1000 * 1000)
+#define SPI_PACKET_SIZE (HEADER_SIZE + LED_COUNT * 3)
+#define BAUDRATE (8 * 1000 * 1000)
 #define FRAME_RATE 16000
-#define BRIGHTNESS 100
 
 namespace euclid {
 
@@ -21,7 +20,7 @@ SPIConnection::SPIConnection(sptr<Arbiter<Lattice>> observation_arbiter)
     }
 
     spdlog::info("opening SPI connection");
-    send_buffer.resize(PACKET_SIZE, 0);
+    send_buffer.resize(SPI_PACKET_SIZE, 0);
     spi_handle = spiOpen(0, BAUDRATE, 0);
     if (spi_handle < 0) {
         spdlog::error("failed to open spi connection, error code: {}", spi_handle);
@@ -29,24 +28,44 @@ SPIConnection::SPIConnection(sptr<Arbiter<Lattice>> observation_arbiter)
 
     spdlog::info("offering SPI salutation!");
     vect<unsigned char> salutation;
-    salutation.reserve(PACKET_SIZE);
-    salutation.push_back(BRIGHTNESS);
+    salutation.reserve(SPI_PACKET_SIZE);
+    salutation.push_back(1);
+    salutation.push_back(2);
+    salutation.push_back(4);
+    salutation.push_back(8);
+    salutation.push_back(7);
+    salutation.push_back(5);
     salutation.push_back(0);
     salutation.push_back(0);
-    salutation.push_back(0);
-    for (int i = 0; i < 33; i++) {
-            salutation.push_back(i * 3);
-            salutation.push_back(i * 2);
-            salutation.push_back(i * 4);
-        }
+
+    for (int i = 0; i < 2; i++) {
+        salutation.push_back(77);
+        salutation.push_back(33);
+        salutation.push_back(0);
+    }
+    for (int i = 0; i < 4; i++) {
+        salutation.push_back(0);
+        salutation.push_back(0);
+        salutation.push_back(0);
+    }
+    for (int i = 0; i < 2; i++) {
+        salutation.push_back(33);
+        salutation.push_back(77);
+        salutation.push_back(0);
+    }
+    for (int i = 0; i < LED_COUNT - 8; i++) {
+        salutation.push_back(0);
+        salutation.push_back(0);
+        salutation.push_back(0);
+    }
     send(salutation.data());
     spdlog::info("(*) spi connection");
 }
 
 void SPIConnection::send(const unsigned char *data) {
-    std::memcpy(send_buffer.data(), data, PACKET_SIZE);
-    auto spiResult = spiWrite(spi_handle, send_buffer.data(), PACKET_SIZE);
-    if (spiResult != PACKET_SIZE) {
+    std::memcpy(send_buffer.data(), data, SPI_PACKET_SIZE);
+    auto spiResult = spiWrite(spi_handle, send_buffer.data(), SPI_PACKET_SIZE);
+    if (spiResult != SPI_PACKET_SIZE) {
         spdlog::info("spi write failed, error code: {}", spiResult);
     }
 }
@@ -55,13 +74,18 @@ void SPIConnection::activate() {
     if (observation_arbiter->ready()) {
         auto lattice = observation_arbiter->take();
         vect<unsigned char> new_data;
-        new_data.reserve(PACKET_SIZE);
+        new_data.reserve(SPI_PACKET_SIZE);
 
         // header
-        new_data.push_back(BRIGHTNESS);
+        new_data.push_back(1);
+        new_data.push_back(2);
+        new_data.push_back(4);
+        new_data.push_back(8);
+        new_data.push_back(7);
+        new_data.push_back(5);
         new_data.push_back(0);
         new_data.push_back(0);
-        new_data.push_back(0);
+
         for (int y = lattice->height - 1; y >= 0; y--) {
             for (int x = 0; x < lattice->width; x++) {
                 auto color = lattice->get_color(x, y);
