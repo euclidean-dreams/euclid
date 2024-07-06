@@ -153,7 +153,7 @@ void bootstrap() {
     float gain = 1.0;
 #endif
 #ifdef QUETZAL
-    float gain = 1.0;
+    float gain = 100.0;
 #endif
 #ifdef SDL_AUDIO
     SDL_Init(SDL_INIT_AUDIO);
