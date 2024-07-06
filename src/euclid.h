@@ -34,7 +34,7 @@
 #endif
 #ifdef QUETZAL
 
-#include "optics/quetzal_output.h"
+#include "optics/quetzal.h"
 
 #endif
 
@@ -65,7 +65,7 @@ SDL_Window *window;
 SDL_Renderer *renderer;
 #endif
 #ifdef QUETZAL
-uptr<QuetzalOutput> quetzal_output;
+uptr<Quetzal> quetzal;
 #endif
 
 uint64_t last_render_time = 0;
@@ -118,7 +118,7 @@ public:
             opus->render();
 #endif
 #ifdef QUETZAL
-            quetzal_output->send(mv(lattice));
+            quetzal->send(mv(lattice));
 #endif
         }
     }
@@ -153,7 +153,7 @@ void bootstrap() {
     float gain = 1.0;
 #endif
 #ifdef QUETZAL
-    float gain = 12.0;
+    float gain = 1.0;
 #endif
 #ifdef SDL_AUDIO
     SDL_Init(SDL_INIT_AUDIO);
@@ -193,7 +193,7 @@ void bootstrap() {
     fascia = mkuptr<Fascia>(*equalizer);
 #endif
 #ifdef QUETZAL
-    quetzal_output = mkuptr<QuetzalOutput>();
+    quetzal = mkuptr<Quetzal>();
 #endif
     spdlog::info("(~) optics");
     spdlog::info("(~) Initialized euclid");

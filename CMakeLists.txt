@@ -18,6 +18,8 @@ option(wasm "build for the web" OFF)
 option(mac "build for a mac" OFF)
 option(quetzal "build for a quetzal" OFF)
 
+message("mac: ${mac}, wasm: ${wasm}, quetzal: ${quetzal}")
+
 # render width and height
 if (wasm)
     # set automatically by the browser
@@ -67,7 +69,7 @@ if (quetzal)
     set(
             SOURCE_FILES
             ${SOURCE_FILES}
-            src/optics/quetzal_output.cpp src/optics/quetzal_output.h
+            src/optics/quetzal.cpp src/optics/quetzal.h
             src/acoustics/portaudio_input.h
             src/acoustics/kfr_fft.h
 

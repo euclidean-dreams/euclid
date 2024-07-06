@@ -1,4 +1,4 @@
-#include "quetzal_output.h"
+#include "quetzal.h"
 #include <pigpio.h>
 
 #define HEADER_SIZE 4
@@ -78,14 +78,14 @@ uint64_t SPIConnection::get_tick_interval() {
     return FRAME_RATE;
 }
 
-QuetzalOutput::QuetzalOutput() :
+Quetzal::Quetzal() :
         observation_arbiter{} {
     observation_arbiter = mksptr<Arbiter<Lattice>>();
     auto spi_connection = mkuptr<SPIConnection>(observation_arbiter);
     spi_thread = Circlet::begin(mv(spi_connection));
 }
 
-void QuetzalOutput::send(std::unique_ptr<Lattice> lattice) {
+void Quetzal::send(std::unique_ptr<Lattice> lattice) {
     observation_arbiter->give(mv(lattice));
 }
 
