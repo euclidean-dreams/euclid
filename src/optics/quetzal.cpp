@@ -35,8 +35,10 @@ SPIConnection::SPIConnection(sptr<Arbiter<Lattice>> observation_arbiter)
     salutation.push_back(8);
     salutation.push_back(7);
     salutation.push_back(5);
+    salutation.push_back(header_index);
     salutation.push_back(0);
-    salutation.push_back(0);
+    header_index++;
+    header_index %= 256;
 
     for (int i = 0; i < 2; i++) {
         salutation.push_back(77);
@@ -83,8 +85,10 @@ void SPIConnection::activate() {
         new_data.push_back(8);
         new_data.push_back(7);
         new_data.push_back(5);
+        new_data.push_back(header_index);
         new_data.push_back(0);
-        new_data.push_back(0);
+        header_index++;
+        header_index %= 256;
 
         for (int y = 0; y < lattice->height; y++) {
             for (int x = 0; x < lattice->width; x++) {

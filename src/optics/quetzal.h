@@ -9,6 +9,7 @@ private:
     std::vector<char> send_buffer;
     int spi_handle;
     sptr<Arbiter<Lattice>> observation_arbiter;
+    uint8_t header_index = 0;
 
     void send(const unsigned char *data);
 
