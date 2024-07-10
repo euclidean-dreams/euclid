@@ -17,8 +17,9 @@ option(debug "debug" OFF)
 option(wasm "build for the web" OFF)
 option(mac "build for a mac" OFF)
 option(quetzal "build for a quetzal" OFF)
+option(kfr "accelerate fft calculations with kfr" OFF)
 
-message("mac: ${mac}, wasm: ${wasm}, quetzal: ${quetzal}")
+message("mac: ${mac}, wasm: ${wasm}, quetzal: ${quetzal}, kfr: ${kfr}")
 
 # render width and height
 if (wasm)
@@ -50,7 +51,6 @@ if (wasm)
             ${SOURCE_FILES}
             src/optics/opus.cpp src/optics/opus.h
             src/acoustics/sdl_input.h
-            src/acoustics/kiss_fft.h
     )
 endif ()
 if (mac)
@@ -60,7 +60,6 @@ if (mac)
             src/optics/opus.cpp src/optics/opus.h
             src/interaction/fascia.cpp src/interaction/fascia.h
             src/acoustics/sdl_input.h
-            src/acoustics/kiss_fft.h
             src/optics/lodepng.cpp src/optics/lodepng.h
             src/optics/save_png.h
     )
@@ -71,10 +70,23 @@ if (quetzal)
             ${SOURCE_FILES}
             src/optics/quetzal.cpp src/optics/quetzal.h
             src/acoustics/portaudio_input.h
-            src/acoustics/kfr_fft.h
-
     )
 endif ()
+if (kfr)
+    set(
+            SOURCE_FILES
+            ${SOURCE_FILES}
+            src/acoustics/kfr_fft.h
+    )
+else ()
+    set(
+            SOURCE_FILES
+            ${SOURCE_FILES}
+            src/acoustics/kiss_fft.h
+    )
+endif ()
+
+
 add_executable(euclid ${SOURCE_FILES})
 target_include_directories(euclid PRIVATE src)
 
@@ -154,7 +166,11 @@ endif ()
 #########
 ## FFT ##
 #########
-if (wasm)
+if (kfr)
+    find_package(KFR CONFIG REQUIRED)
+    target_link_libraries(euclid PRIVATE kfr kfr_dft)
+    add_compile_definitions(KFR_FFT)
+else ()
     SET(KISSFFT_TOOLS OFF)
     SET(KISSFFT_TEST OFF)
     integrate_cmake_dependency(
@@ -164,10 +180,4 @@ if (wasm)
     )
     target_link_libraries(euclid PRIVATE kissfft)
     add_compile_definitions(KISS_FFT)
-elseif (mac OR quetzal)
-    find_package(KFR CONFIG REQUIRED)
-    target_link_libraries(euclid PRIVATE kfr kfr_dft)
-    add_compile_definitions(KFR_FFT)
-else ()
-    message(FATAL_ERROR "could not resolve fft library for given build options")
 endif ()
