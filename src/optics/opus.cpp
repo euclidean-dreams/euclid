@@ -111,18 +111,17 @@ SDL_Texture *Tesselation::generate_circle() {
     blue_mask = 0x00ff0000;
     alpha_mask = 0xff000000;
 #endif
-    int surface_width = 16;
-    int surface_height = 16;
-    auto surface = SDL_CreateRGBSurface(0, surface_width, surface_height, 32,
+    int size = 32;
+    auto surface = SDL_CreateRGBSurface(0, size, size, 32,
                                         red_mask, green_mask, blue_mask, alpha_mask);
     auto pixels = (Uint32 *) surface->pixels;
     auto surface_color = SDL_MapRGBA(surface->format, 255, 255, 255, 128);
-    for (int y = 0; y <= surface_width; y++) {
-        for (int x = 0; x <= surface_height; x++) {
-            auto radius = 8;
-            if (radius * radius > (x - surface_width / 2) * (x - surface_width / 2) +
-                                  (y - surface_height / 2) * (y - surface_height / 2)) {
-                auto pixel_index = surface_width * (surface_height - 1 - y) + x;
+    for (int y = 0; y <= size; y++) {
+        for (int x = 0; x <= size; x++) {
+            auto radius = size / 2;
+            if (radius * radius > (x - size / 2) * (x - size / 2) +
+                                  (y - size / 2) * (y - size / 2)) {
+                auto pixel_index = size * (size - 1 - y) + x;
                 pixels[pixel_index] = surface_color;
             }
         }
