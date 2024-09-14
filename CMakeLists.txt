@@ -125,6 +125,8 @@ if (mac)
     target_link_libraries(euclid PRIVATE ${SDL2_LIBRARIES})
     include_directories(euclid /opt/homebrew/Cellar/sdl2_ttf/2.22.0/include)
     target_link_libraries(euclid PUBLIC /opt/homebrew/Cellar/sdl2_ttf/2.22.0/lib/libSDL2_ttf.dylib)
+    include_directories(euclid /opt/homebrew/Cellar/sdl2_image/2.8.2_1/include)
+    target_link_libraries(euclid PUBLIC /opt/homebrew/Cellar/sdl2_image/2.8.2_1/lib/libSDL2_image.dylib)
     target_link_libraries(euclid PUBLIC /opt/homebrew/Cellar/fmt/10.2.1_1/lib/libfmt.dylib)
 endif ()
 

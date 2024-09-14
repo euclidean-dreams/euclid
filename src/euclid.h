@@ -107,13 +107,14 @@ public:
             auto lattice = cosmos->observe();
 #ifdef OPUS
             if (lattice != nullptr) {
-#ifdef TESSELATION
-                Tesselation tesselation{*lattice};
-                opus->blit(tesselation.finalize(), tesselation.area);
-#else
-                Canvas canvas{*lattice};
-                opus->blit(canvas.finalize(), canvas.area);
-#endif
+                opus->fill(lattice->null_pith.color);
+                if (lattice->tessellate) {
+                    Tesselation tesselation{*lattice};
+                    opus->blit(tesselation.finalize(), tesselation.area);
+                } else {
+                    Canvas canvas{*lattice};
+                    opus->blit(canvas.finalize(), canvas.area);
+                }
             }
 #ifdef MAC
             auto canvas = fascia->observe();

@@ -26,7 +26,7 @@ public:
     SDL_Texture *finalize();
 };
 
-class Tesselation: public Name {
+class Tesselation : public Name {
 public:
     int width;
     int height;
@@ -35,12 +35,17 @@ public:
 
     Tesselation(Lattice &lattice);
 
-    SDL_Texture *finalize();
+    SDL_Texture *generate_circle();
 
+    SDL_Texture *load_image(std::string path);
+
+    SDL_Texture *finalize();
 };
 
 class Opus : public Name {
 public:
+    void fill(Color color);
+
     void blit(SDL_Texture *texture, SDL_Rect destination);
 
     void render();
