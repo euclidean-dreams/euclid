@@ -38,12 +38,13 @@ Canvas::Canvas(Lattice &lattice) :
                                         red_mask, green_mask, blue_mask, alpha_mask);
     auto pixels = (Uint32 *) surface->pixels;
     for (int i = 0; i < render_width * render_height; i++) {
-        auto null_color = lattice.null_color;
+        auto null_color = lattice.null_pith.color;
         pixels[i] = SDL_MapRGBA(surface->format, null_color.red, null_color.green, null_color.blue, 255);
     }
     for (auto &dot: lattice) {
         auto coordinate = dot.first;
-        auto color = dot.second;
+        auto pith = dot.second;
+        auto color = pith.color;
         auto surface_color = SDL_MapRGBA(surface->format, color.red, color.green, color.blue, 255);
         int stretch = 1;
         auto initial_y = coordinate.y * stretch;
@@ -74,6 +75,35 @@ void Canvas::paint_point(Point point, Color color) {
 }
 
 SDL_Texture *Canvas::finalize() {
+    return texture;
+}
+
+Tesselation::Tesselation(Lattice &lattice) :
+        width{lattice.width},
+        height{lattice.height},
+        area{0, 0, width, height},
+        texture{} {
+    texture = SDL_CreateTexture(
+            renderer,
+            SDL_PIXELFORMAT_ARGB8888,
+            SDL_TEXTUREACCESS_TARGET,
+            width,
+            height
+    );
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderTarget(renderer, texture);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderFillRect(renderer, &area);
+    for (auto &dot: lattice) {
+        auto coordinate = dot.first;
+        auto pith = dot.second;
+        auto color = pith.color;
+        SDL_SetRenderDrawColor(renderer, color.red, color.green, color.blue, 255);
+        SDL_RenderDrawPoint(renderer, coordinate.x, coordinate.y);
+    }
+}
+
+SDL_Texture *Tesselation::finalize() {
     return texture;
 }
 

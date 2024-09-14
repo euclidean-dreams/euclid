@@ -26,6 +26,19 @@ public:
     SDL_Texture *finalize();
 };
 
+class Tesselation: public Name {
+public:
+    int width;
+    int height;
+    SDL_Rect area;
+    SDL_Texture *texture;
+
+    Tesselation(Lattice &lattice);
+
+    SDL_Texture *finalize();
+
+};
+
 class Opus : public Name {
 public:
     void blit(SDL_Texture *texture, SDL_Rect destination);
