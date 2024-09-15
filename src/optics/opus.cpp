@@ -111,7 +111,7 @@ SDL_Texture *Tesselation::generate_circle() {
     blue_mask = 0x00ff0000;
     alpha_mask = 0xff000000;
 #endif
-    int size = 32;
+    int size = 128;
     auto surface = SDL_CreateRGBSurface(0, size, size, 32,
                                         red_mask, green_mask, blue_mask, alpha_mask);
     auto pixels = (Uint32 *) surface->pixels;
