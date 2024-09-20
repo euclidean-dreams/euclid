@@ -19,10 +19,6 @@ public:
 
     Canvas(Lattice &lattice);
 
-    void paint_rect(SDL_Rect &rect, Color color);
-
-    void paint_point(Point point, Color color);
-
     SDL_Texture *finalize();
 };
 

@@ -34,7 +34,7 @@ Canvas::Canvas(Lattice &lattice) :
     auto pixels = (Uint32 *) surface->pixels;
     for (int i = 0; i < render_width * render_height; i++) {
         auto null_color = lattice.null_pith.color;
-        pixels[i] = SDL_MapRGBA(surface->format, null_color.red, null_color.green, null_color.blue, 255);
+        pixels[i] = SDL_MapRGBA(surface->format, null_color.red, null_color.green, null_color.blue, 0);
     }
     for (auto &dot: lattice) {
         auto coordinate = dot.first;
@@ -55,18 +55,6 @@ Canvas::Canvas(Lattice &lattice) :
     SDL_FreeSurface(surface);
 
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-}
-
-void Canvas::paint_rect(SDL_Rect &rect, Color color) {
-    SDL_SetRenderTarget(renderer, texture);
-    SDL_SetRenderDrawColor(renderer, color.red, color.green, color.blue, 255);
-    SDL_RenderFillRect(renderer, &rect);
-}
-
-void Canvas::paint_point(Point point, Color color) {
-    SDL_SetRenderTarget(renderer, texture);
-    SDL_SetRenderDrawColor(renderer, color.red, color.green, color.blue, 255);
-    SDL_RenderDrawPoint(renderer, point.x, point.y);
 }
 
 SDL_Texture *Canvas::finalize() {
