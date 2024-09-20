@@ -30,6 +30,7 @@
 
 #include "optics/opus.h"
 #include "interaction/fascia.h"
+#include "impressions/juice.h"
 
 #endif
 #ifdef QUETZAL
@@ -47,7 +48,7 @@ bool running = true;
 
 uptr<Equalizer> equalizer;
 uptr<FourierTransform> fourier_transform;
-uptr<Cosmology> cosmos;
+vect<uptr<Cosmology>> cosmos;
 #ifdef SDL_AUDIO
 uptr<SDLAudioInput> audio_input;
 #endif
@@ -94,7 +95,9 @@ private:
             auto magnitude = scast<float>(std::sqrt(std::pow(sample.real(), 2) + std::pow(sample.imag(), 2)));
             stft_magnitudes->push_back(magnitude);
         }
-        cosmos->experience(stft_magnitudes);
+        for (auto &cosmology: cosmos) {
+            cosmology->experience(stft_magnitudes);
+        }
     }
 
 public:
@@ -104,16 +107,19 @@ public:
         }
         if (get_current_time() - last_render_time > RENDER_TICK_INTERVAL) {
             last_render_time = get_current_time();
-            auto lattice = cosmos->observe();
+
+            for (auto &cosmology: cosmos) {
+                auto lattice = cosmology->observe();
 #ifdef OPUS
-            if (lattice != nullptr) {
-                opus->fill(lattice->null_pith.color);
-                if (lattice->tessellate) {
-                    Tesselation tesselation{*lattice};
-                    opus->blit(tesselation.finalize(), tesselation.area);
-                } else {
-                    Canvas canvas{*lattice};
-                    opus->blit(canvas.finalize(), canvas.area);
+                if (lattice != nullptr) {
+                    opus->fill(lattice->null_pith.color);
+                    if (lattice->tessellate) {
+                        Tesselation tesselation{*lattice};
+                        opus->blit(tesselation.finalize(), tesselation.area);
+                    } else {
+                        Canvas canvas{*lattice};
+                        opus->blit(canvas.finalize(), canvas.area);
+                    }
                 }
             }
 #ifdef MAC
@@ -172,9 +178,9 @@ void bootstrap() {
     fourier_transform = mkuptr<FourierTransform>();
     spdlog::info("(~) acoustics");
 
-    spdlog::info("( ) cosmology");
-    cosmos = mkuptr<Cosmology>(render_width, render_height, STFT_SIZE);
-    spdlog::info("(~) cosmology");
+    spdlog::info("( ) cosmos");
+    cosmos.push_back(mkuptr<Cosmology>(render_width, render_height, STFT_SIZE, Impressions::watercolor));
+    spdlog::info("(~) cosmos");
 
     spdlog::info("( ) optics");
 #ifdef OPUS
