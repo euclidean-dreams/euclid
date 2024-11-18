@@ -62,6 +62,7 @@ uptr<Fascia> fascia;
 
 #ifdef OPUS
 uptr<Opus> opus;
+uptr<TextureCache> texture_cache;
 SDL_Window *window;
 SDL_Renderer *renderer;
 #endif
@@ -114,7 +115,7 @@ public:
                 if (lattice != nullptr) {
                     opus->fill(lattice->null_pith.color);
                     if (lattice->tessellate) {
-                        Tesselation tesselation{*lattice};
+                        Tesselation tesselation{*lattice, *texture_cache};
                         opus->blit(tesselation.finalize(), tesselation.area);
                     } else {
                         Canvas canvas{*lattice};
@@ -179,7 +180,7 @@ void bootstrap() {
     spdlog::info("(~) acoustics");
 
     spdlog::info("( ) cosmos");
-    cosmos.push_back(mkuptr<Cosmology>(render_width, render_height, STFT_SIZE, Impressions::watercolor));
+    cosmos.push_back(mkuptr<Cosmology>(render_width, render_height, STFT_SIZE, Impressions::here_there_be_dragons));
     spdlog::info("(~) cosmos");
 
     spdlog::info("( ) optics");
@@ -200,6 +201,7 @@ void bootstrap() {
     renderer = SDL_CreateRenderer(window, -1, rendererFlags);
     spdlog::info("(~) renderer");
     opus = mkuptr<Opus>();
+    texture_cache = mkuptr<TextureCache>();
 #endif
 #ifdef MAC
     fascia = mkuptr<Fascia>(*equalizer);

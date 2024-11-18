@@ -51,6 +51,10 @@ void Fascia::handle_events() {
                 CHAOS = embind_flt(0.01, CHAOS + 0.1 * multiplier, 99999);
             } else if (symbol == SDLK_h) {
                 CHAOS = embind_flt(0.01, CHAOS - 0.1 * multiplier, 99999);
+            } else if (symbol == SDLK_p) {
+                COLOR = cyclic_embind(0, COLOR + 1 * multiplier, HSL_HUE_MAX);
+            } else if (symbol == SDLK_l) {
+                COLOR = cyclic_embind(0, COLOR - 1 * multiplier, HSL_HUE_MAX);
             }
         }
     }
@@ -69,6 +73,7 @@ uptr<Canvas> Fascia::observe() {
         lines.push_back("[r|f] resonance ~ " + std::to_string(RESONANCE));
         lines.push_back("[t|g] twist ~ " + std::to_string(TWIST));
         lines.push_back("[y|h] chaos ~ " + std::to_string(CHAOS));
+        lines.push_back("[p|l] color ~ " + std::to_string(COLOR));
         lines.push_back("(~) please enjoy!");
 
         auto vertical_offset = horizontal_offset;

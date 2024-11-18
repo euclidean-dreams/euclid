@@ -22,6 +22,25 @@ public:
     SDL_Texture *finalize();
 };
 
+
+class TextureCache : public Name {
+private:
+    SDL_Texture *load_image(std::string path);
+
+    SDL_Texture *generate_circle();
+
+    SDL_Texture *generate_dragon_curve(int magnitude);
+
+public:
+    SDL_Texture *circle;
+    vect<SDL_Texture *>dragon_curves;
+
+    TextureCache();
+
+    ~TextureCache();
+};
+
+
 class Tesselation : public Name {
 public:
     int width;
@@ -29,11 +48,7 @@ public:
     SDL_Rect area;
     SDL_Texture *texture;
 
-    Tesselation(Lattice &lattice);
-
-    SDL_Texture *generate_circle();
-
-    SDL_Texture *load_image(std::string path);
+    Tesselation(Lattice &lattice, TextureCache &texture_cache);
 
     SDL_Texture *finalize();
 };
