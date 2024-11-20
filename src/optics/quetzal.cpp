@@ -92,7 +92,7 @@ void SPIConnection::activate() {
 
         for (int y = 0; y < lattice->height; y++) {
             for (int x = 0; x < lattice->width; x++) {
-                auto color = lattice->get_color(x, y);
+                auto color = lattice->get_pith(x, y).color;
                 new_data.push_back(color.red);
                 new_data.push_back(color.green);
                 new_data.push_back(color.blue);

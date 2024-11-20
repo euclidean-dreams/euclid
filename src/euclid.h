@@ -10,7 +10,9 @@
 
 #endif
 #ifdef KISS_FFT
+
 #include "acoustics/kiss_fft.h"
+
 #endif
 
 // acoustics
@@ -131,7 +133,8 @@ public:
             opus->render();
 #endif
 #ifdef QUETZAL
-            quetzal->send(mv(lattice));
+                quetzal->send(mv(lattice));
+            }
 #endif
         }
     }
@@ -180,7 +183,7 @@ void bootstrap() {
     spdlog::info("(~) acoustics");
 
     spdlog::info("( ) cosmos");
-    cosmos.push_back(mkuptr<Cosmology>(render_width, render_height, STFT_SIZE, Impressions::here_there_be_dragons));
+    cosmos.push_back(mkuptr<Cosmology>(render_width, render_height, STFT_SIZE, Impressions::obsidian));
     spdlog::info("(~) cosmos");
 
     spdlog::info("( ) optics");
