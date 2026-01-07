@@ -97,7 +97,7 @@ Tesselation::Tesselation(Lattice &lattice, TextureCache &texture_cache) :
         } else {
             tessellation_texture = texture_cache.circle;
         }
-        SDL_Rect destination_area{dest_top_left_x, dest_top_left_y, scint(scale), scint(scale)};
+        SDL_Rect destination_area{dest_top_left_x, OBSERVATION_HEIGHT - dest_top_left_y, scint(scale), scint(scale)};
         SDL_SetTextureColorMod(tessellation_texture, color.red, color.green, color.blue);
         SDL_RenderCopyEx(renderer, tessellation_texture, nullptr, &destination_area,
                          rotation, nullptr, SDL_FLIP_NONE);
