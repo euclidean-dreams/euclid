@@ -71,7 +71,9 @@ if (quetzal)
             SOURCE_FILES
             ${SOURCE_FILES}
             src/optics/quetzal.cpp src/optics/quetzal.h
+            src/optics/dmx/rig.h
             src/acoustics/portaudio_input.h
+            src/optics/dmx/vivid.h src/optics/dmx/vivid.cpp
     )
 endif ()
 if (kfr)

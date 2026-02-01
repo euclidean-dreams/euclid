@@ -37,12 +37,13 @@
 #endif
 #ifdef QUETZAL
 
+#include "optics/dmx/rig.h"
+#include "optics/dmx/vivid.h"
 #include "optics/quetzal.h"
 
 #endif
 
 namespace euclid {
-
 int RENDER_TICK_INTERVAL = 9000;
 int render_width;
 int render_height;
@@ -69,6 +70,7 @@ SDL_Window *window;
 SDL_Renderer *renderer;
 #endif
 #ifdef QUETZAL
+uptr<Rig> rig;
 uptr<Quetzal> quetzal;
 #endif
 
@@ -126,14 +128,16 @@ public:
                 }
             }
 #ifdef MAC
-            auto canvas = fascia->observe();
-            opus->blit(canvas->finalize(), canvas->area);
-            fascia->handle_events();
+                auto canvas = fascia->observe();
+                opus->blit(canvas->finalize(), canvas->area);
+                fascia->handle_events();
 #endif
-            opus->render();
+                opus->render();
 #endif
 #ifdef QUETZAL
-                quetzal->send(mv(lattice));
+                auto frame = rig->interpret(*lattice);
+                auto quetzal_packet = mkuptr<QuetzalPacket>(*frame);
+                quetzal->send(mv(quetzal_packet));
             }
 #endif
         }
@@ -169,7 +173,7 @@ void bootstrap() {
     float gain = 1.0;
 #endif
 #ifdef QUETZAL
-    float gain = 0.1;
+    float gain = 1.0;
 #endif
 #ifdef SDL_AUDIO
     SDL_Init(SDL_INIT_AUDIO);
@@ -183,7 +187,7 @@ void bootstrap() {
     spdlog::info("(~) acoustics");
 
     spdlog::info("( ) cosmos");
-    cosmos.push_back(mkuptr<Cosmology>(render_width, render_height, STFT_SIZE, Impressions::linework));
+    cosmos.push_back(mkuptr<Cosmology>(render_width, render_height, STFT_SIZE, Impressions::spherics));
     spdlog::info("(~) cosmos");
 
     spdlog::info("( ) optics");
@@ -193,12 +197,12 @@ void bootstrap() {
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
     Uint32 window_flags = SDL_WINDOW_BORDERLESS;
     window = SDL_CreateWindow(
-            "euclid",
-            SDL_WINDOWPOS_UNDEFINED,
-            SDL_WINDOWPOS_UNDEFINED,
-            render_width,
-            render_height,
-            window_flags
+        "euclid",
+        SDL_WINDOWPOS_UNDEFINED,
+        SDL_WINDOWPOS_UNDEFINED,
+        render_width,
+        render_height,
+        window_flags
     );
     Uint32 rendererFlags = SDL_RENDERER_ACCELERATED;
     renderer = SDL_CreateRenderer(window, -1, rendererFlags);
@@ -210,6 +214,11 @@ void bootstrap() {
     fascia = mkuptr<Fascia>(*equalizer);
 #endif
 #ifdef QUETZAL
+    rig = mkuptr<Rig>();
+    auto vivid = mkuptr<Vivid>(Coordinate{0, 0}, Coordinate{50, 2}, 1);
+    rig->add_fixture(mv(vivid));
+    vivid = mkuptr<Vivid>(Coordinate{0, 3}, Coordinate{50, 4}, 33);
+    rig->add_fixture(mv(vivid));
     quetzal = mkuptr<Quetzal>();
 #endif
     spdlog::info("(~) optics");
@@ -223,5 +232,4 @@ void bootstrap() {
     }
 #endif
 };
-
 }
