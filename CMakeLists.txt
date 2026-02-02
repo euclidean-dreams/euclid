@@ -16,10 +16,11 @@ option(debug "debug" OFF)
 # pick one!
 option(wasm "build for the web" OFF)
 option(mac "build for a mac" OFF)
-option(quetzal "build for a quetzal" OFF)
+option(quetzal_keyhole "build for a quetzal keyhole" OFF)
+option(quetzal_dmx "build for a quetzal dmx rig" OFF)
 option(kfr "accelerate fft calculations with kfr" OFF)
 
-message("mac: ${mac}, wasm: ${wasm}, quetzal: ${quetzal}, kfr: ${kfr}")
+message("mac: ${mac}, wasm: ${wasm}, quetzal_keyhole: ${quetzal_keyhole}, quetzal_dmx: ${quetzal_dmx}, kfr: ${kfr}")
 
 # render width and height
 if (wasm)
@@ -31,7 +32,7 @@ elseif (mac)
     set(RENDER_HEIGHT 64 CACHE STRING "height of the output frame")
     add_compile_definitions(COMPILED_RENDER_WIDTH=${RENDER_WIDTH})
     add_compile_definitions(COMPILED_RENDER_HEIGHT=${RENDER_HEIGHT})
-elseif (quetzal)
+elseif (quetzal_dmx OR quetzal_keyhole)
     set(RENDER_WIDTH 64 CACHE STRING "width of the output frame")
     set(RENDER_HEIGHT 64 CACHE STRING "height of the output frame")
     add_compile_definitions(COMPILED_RENDER_WIDTH=${RENDER_WIDTH})
@@ -66,7 +67,7 @@ if (mac)
             src/optics/save_png.h
     )
 endif ()
-if (quetzal)
+if (quetzal_dmx OR quetzal_keyhole)
     set(
             SOURCE_FILES
             ${SOURCE_FILES}
@@ -137,9 +138,15 @@ endif ()
 ##############
 ### quetzal ##
 ##############
-if (quetzal)
+if (quetzal_dmx OR quetzal_keyhole)
     message("(~) building for quetzal")
+
     add_compile_definitions(QUETZAL PORT_AUDIO)
+    if (quetzal_dmx)
+        add_compile_definitions(QUETZAL_DMX)
+    elseif(quetzal_keyhole)
+        add_compile_definitions(QUETZAL_KEYHOLE)
+    endif ()
     target_link_libraries(euclid PRIVATE pigpio)
     target_link_libraries(euclid PRIVATE portaudio)
 endif ()

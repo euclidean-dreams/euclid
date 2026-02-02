@@ -3,15 +3,20 @@
 
 #define HEADER_SIZE 8
 #define LED_COUNT (render_width * render_height)
+#ifdef QUETZAL_DMX
+#define SPI_PACKET_SIZE (HEADER_SIZE + 512)
+#define FRAME_RATE 33333
+#endif
+#ifdef QUETZAL_KEYHOLE
 #define SPI_PACKET_SIZE (HEADER_SIZE + LED_COUNT * 3)
-#define BAUDRATE (8 * 1000 * 1000)
 #define FRAME_RATE 16000
+#endif
+#define BAUDRATE (8 * 1000 * 1000)
 
 namespace euclid {
-
-SPIConnection::SPIConnection(sptr<Arbiter<Lattice>> observation_arbiter)
-        : send_buffer{},
-          observation_arbiter{mv(observation_arbiter)} {
+SPIConnection::SPIConnection(sptr<Arbiter<QuetzalPacket>> observation_arbiter)
+    : send_buffer{},
+      observation_arbiter{mv(observation_arbiter)} {
     spdlog::info("( ) spi connection");
     spdlog::info("initializing pigpio");
     auto init_result = gpioInitialise();
@@ -74,31 +79,26 @@ void SPIConnection::send(const unsigned char *data) {
 
 void SPIConnection::activate() {
     if (observation_arbiter->ready()) {
-        auto lattice = observation_arbiter->take();
-        vect<unsigned char> new_data;
-        new_data.reserve(SPI_PACKET_SIZE);
+        auto quetzal_packet = observation_arbiter->take();
+        vect<unsigned char> spi_packet;
+        spi_packet.reserve(SPI_PACKET_SIZE);
 
         // header
-        new_data.push_back(1);
-        new_data.push_back(2);
-        new_data.push_back(4);
-        new_data.push_back(8);
-        new_data.push_back(7);
-        new_data.push_back(5);
-        new_data.push_back(header_index);
-        new_data.push_back(0);
+        spi_packet.push_back(1);
+        spi_packet.push_back(2);
+        spi_packet.push_back(4);
+        spi_packet.push_back(8);
+        spi_packet.push_back(7);
+        spi_packet.push_back(5);
+        spi_packet.push_back(header_index);
+        spi_packet.push_back(0);
         header_index++;
         header_index %= 256;
 
-        for (int y = 0; y < lattice->height; y++) {
-            for (int x = 0; x < lattice->width; x++) {
-                auto color = lattice->get_pith(x, y).color;
-                new_data.push_back(color.red);
-                new_data.push_back(color.green);
-                new_data.push_back(color.blue);
-            }
+        for (auto &sample: quetzal_packet->samples) {
+            spi_packet.push_back(sample);
         }
-        send(new_data.data());
+        send(spi_packet.data());
     }
 }
 
@@ -107,14 +107,13 @@ uint64_t SPIConnection::get_tick_interval() {
 }
 
 Quetzal::Quetzal() :
-        observation_arbiter{} {
-    observation_arbiter = mksptr<Arbiter<Lattice>>();
+    observation_arbiter{} {
+    observation_arbiter = mksptr<Arbiter<QuetzalPacket>>();
     auto spi_connection = mkuptr<SPIConnection>(observation_arbiter);
     spi_thread = Circlet::begin(mv(spi_connection));
 }
 
-void Quetzal::send(std::unique_ptr<Lattice> lattice) {
-    observation_arbiter->give(mv(lattice));
+void Quetzal::send(std::unique_ptr<QuetzalPacket> packet) {
+    observation_arbiter->give(mv(packet));
 }
-
 }

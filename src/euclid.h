@@ -134,9 +134,14 @@ public:
 #endif
                 opus->render();
 #endif
-#ifdef QUETZAL
+#ifdef QUETZAL_DMX
                 auto frame = rig->interpret(*lattice);
                 auto quetzal_packet = mkuptr<QuetzalPacket>(*frame);
+                quetzal->send(mv(quetzal_packet));
+        }
+#endif
+#ifdef QUETZAL_KEYHOLE
+                auto quetzal_packet = mkuptr<QuetzalPacket>(*lattice);
                 quetzal->send(mv(quetzal_packet));
             }
 #endif
@@ -187,7 +192,11 @@ void bootstrap() {
     spdlog::info("(~) acoustics");
 
     spdlog::info("( ) cosmos");
+#ifdef QUETZAL
+    cosmos.push_back(mkuptr<Cosmology>(render_width, render_height, STFT_SIZE, Impressions::obsidian));
+#else
     cosmos.push_back(mkuptr<Cosmology>(render_width, render_height, STFT_SIZE, Impressions::spherics));
+#endif
     spdlog::info("(~) cosmos");
 
     spdlog::info("( ) optics");
