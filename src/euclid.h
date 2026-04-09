@@ -193,7 +193,7 @@ void bootstrap() {
 
     spdlog::info("( ) cosmos");
 #ifdef QUETZAL
-    cosmos.push_back(mkuptr<Cosmology>(render_width, render_height, STFT_SIZE, Impressions::obsidian));
+    cosmos.push_back(mkuptr<Cosmology>(render_width, render_height, STFT_SIZE, Impressions::ambiance));
 #else
     cosmos.push_back(mkuptr<Cosmology>(render_width, render_height, STFT_SIZE, Impressions::watercolor));
 #endif
