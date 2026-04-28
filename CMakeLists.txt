@@ -157,6 +157,7 @@ endif ()
 ###############
 add_subdirectory(lib/cosmology)
 target_link_libraries(euclid PRIVATE cosmology)
+target_link_libraries(euclid PRIVATE cosmology_selections)
 
 
 ############
