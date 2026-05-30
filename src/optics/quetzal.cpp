@@ -1,7 +1,7 @@
 #include "quetzal.h"
 #include <pigpio.h>
 
-#define HEADER_SIZE 8
+#define HEADER_SIZE 16
 #define LED_COUNT (render_width * render_height)
 #ifdef QUETZAL_DMX
 #define SPI_PACKET_SIZE (HEADER_SIZE + 512)
@@ -42,6 +42,18 @@ SPIConnection::SPIConnection(sptr<Arbiter<QuetzalPacket>> observation_arbiter)
     salutation.push_back(5);
     salutation.push_back(header_index);
     salutation.push_back(0);
+
+    auto spi_packet_size_stamp = std::bit_cast<std::array<unsigned char, sizeof(int)>>(
+        static_cast<uint32_t>(SPI_PACKET_SIZE));
+    salutation.push_back(spi_packet_size_stamp[0]);
+    salutation.push_back(spi_packet_size_stamp[1]);
+    salutation.push_back(spi_packet_size_stamp[2]);
+    salutation.push_back(spi_packet_size_stamp[3]);
+    salutation.push_back(0);
+    salutation.push_back(0);
+    salutation.push_back(0);
+    salutation.push_back(0);
+
     header_index++;
     header_index %= 256;
 
@@ -92,6 +104,18 @@ void SPIConnection::activate() {
         spi_packet.push_back(5);
         spi_packet.push_back(header_index);
         spi_packet.push_back(0);
+
+        auto spi_packet_size_stamp = std::bit_cast<std::array<unsigned char, sizeof(int)>>(
+            static_cast<uint32_t>(SPI_PACKET_SIZE));
+        spi_packet.push_back(spi_packet_size_stamp[0]);
+        spi_packet.push_back(spi_packet_size_stamp[1]);
+        spi_packet.push_back(spi_packet_size_stamp[2]);
+        spi_packet.push_back(spi_packet_size_stamp[3]);
+        spi_packet.push_back(0);
+        spi_packet.push_back(0);
+        spi_packet.push_back(0);
+        spi_packet.push_back(0);
+
         header_index++;
         header_index %= 256;
 
