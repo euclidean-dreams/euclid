@@ -3,17 +3,7 @@
 #include "paradigm.h"
 #include "perception/equalizer.h"
 #include "cosmology.h"
-
-#ifdef KFR_FFT
-
-#include "perception/kfr_fft.h"
-
-#endif
-#ifdef KISS_FFT
-
 #include "perception/kiss_fft.h"
-
-#endif
 
 // acoustics
 #ifdef SDL_AUDIO

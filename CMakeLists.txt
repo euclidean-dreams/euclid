@@ -161,32 +161,3 @@ else ()
     find_package(spdlog REQUIRED)
     target_link_libraries(euclid PRIVATE spdlog::spdlog_header_only)
 endif ()
-
-
-#########
-## FFT ##
-#########
-if (kfr)
-    find_package(KFR CONFIG REQUIRED)
-    target_link_libraries(euclid PRIVATE kfr kfr_dft)
-    add_compile_definitions(KFR_FFT)
-elseif (wasm)
-    SET(KISSFFT_TOOLS OFF)
-    SET(KISSFFT_TEST OFF)
-    integrate_cmake_dependency(
-            NAME fft
-            GIT_URL git@github.com:mborgerding/kissfft.git
-            GIT_TAG 131.1.0
-    )
-    target_link_libraries(euclid PRIVATE kissfft)
-    add_compile_definitions(KISS_FFT)
-else ()
-    if (mac)
-        include_directories(euclid /Users/josiah/badlands/kissfft/build/include)
-        target_link_libraries(euclid PUBLIC /Users/josiah/badlands/kissfft/build/lib/libkissfft-float.dylib)
-    else ()
-        find_package(kissfft CONFIG REQUIRED)
-        target_link_libraries(euclid PRIVATE kissfft-float)
-    endif ()
-    add_compile_definitions(KISS_FFT)
-endif ()
