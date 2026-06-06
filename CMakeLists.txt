@@ -131,7 +131,7 @@ if (quetzal_dmx OR quetzal_keyhole)
     add_compile_definitions(QUETZAL PORT_AUDIO)
     if (quetzal_dmx)
         add_compile_definitions(QUETZAL_DMX)
-    elseif(quetzal_keyhole)
+    elseif (quetzal_keyhole)
         add_compile_definitions(QUETZAL_KEYHOLE)
     endif ()
     target_link_libraries(euclid PRIVATE pigpio)
@@ -160,4 +160,13 @@ if (wasm)
 else ()
     find_package(spdlog REQUIRED)
     target_link_libraries(euclid PRIVATE spdlog::spdlog_header_only)
+endif ()
+
+#########
+## FFT ##
+#########
+if (kfr)
+    add_compile_definitions(KFR_FFT)
+else ()
+    add_compile_definitions(KISS_FFT)
 endif ()

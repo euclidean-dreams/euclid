@@ -3,7 +3,6 @@
 #include "paradigm.h"
 #include "perception/equalizer.h"
 #include "cosmology.h"
-#include "perception/kiss_fft.h"
 
 // acoustics
 #ifdef SDL_AUDIO
@@ -16,6 +15,18 @@
 #include "acoustics/portaudio_input.h"
 
 #endif
+
+#ifdef KFR_FFT
+
+#include "perception/kfr_fft.h"
+
+#endif
+#ifdef KISS_FFT
+
+#include "perception/kiss_fft.h"
+
+#endif
+
 
 // optics
 #ifdef OPUS
