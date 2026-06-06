@@ -19,7 +19,7 @@ using namespace cosmology;
 ///////////
 
 // power of 2 >= 256
-#define FRAME_SIZE 512
+#define FFT_FRAME_SIZE 512
 
 namespace euclid {
 

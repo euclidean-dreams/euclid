@@ -183,7 +183,7 @@ void bootstrap() {
 #endif
 #ifdef SDL_AUDIO
     SDL_Init(SDL_INIT_AUDIO);
-    audio_input = mkuptr<SDLAudioInput>(FRAME_SIZE);
+    audio_input = mkuptr<SDLAudioInput>(FFT_FRAME_SIZE);
 #endif
 #ifdef PORT_AUDIO
     audio_input = mkuptr<PortaudioInput>(FRAME_SIZE);
