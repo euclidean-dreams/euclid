@@ -186,7 +186,7 @@ void bootstrap() {
     audio_input = mkuptr<SDLAudioInput>(FFT_FRAME_SIZE);
 #endif
 #ifdef PORT_AUDIO
-    audio_input = mkuptr<PortaudioInput>(FRAME_SIZE);
+    audio_input = mkuptr<PortaudioInput>(FFT_FRAME_SIZE);
 #endif
     equalizer = mkuptr<Equalizer>(gain);
     fourier_transform = mkuptr<FourierTransform>();
