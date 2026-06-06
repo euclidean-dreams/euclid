@@ -77,19 +77,6 @@ if (quetzal_dmx OR quetzal_keyhole)
             src/optics/dmx/vivid.h src/optics/dmx/vivid.cpp
     )
 endif ()
-if (kfr)
-    set(
-            SOURCE_FILES
-            ${SOURCE_FILES}
-            src/acoustics/kfr_fft.h
-    )
-else ()
-    set(
-            SOURCE_FILES
-            ${SOURCE_FILES}
-            src/acoustics/kiss_fft.h
-    )
-endif ()
 
 
 add_executable(euclid ${SOURCE_FILES})

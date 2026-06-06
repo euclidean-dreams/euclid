@@ -6,12 +6,12 @@
 
 #ifdef KFR_FFT
 
-#include "acoustics/kfr_fft.h"
+#include "perception/kfr_fft.h"
 
 #endif
 #ifdef KISS_FFT
 
-#include "acoustics/kiss_fft.h"
+#include "perception/kiss_fft.h"
 
 #endif
 
@@ -195,7 +195,7 @@ void bootstrap() {
 #ifdef QUETZAL
     cosmos.push_back(mkuptr<Cosmology>(render_width, render_height, STFT_SIZE, Impressions::allegory));
 #else
-    cosmos.push_back(mkuptr<Cosmology>(render_width, render_height, STFT_SIZE, Impressions::allegory));
+    cosmos.push_back(mkuptr<Cosmology>(render_width, render_height, STFT_SIZE, Impressions::spherics));
 #endif
     spdlog::info("(~) cosmos");
 
