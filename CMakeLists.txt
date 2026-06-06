@@ -7,7 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 project(euclid)
 include(lib/cmake-utils/dependency-integrator.cmake)
 
-
 #############
 ## options ##
 #############

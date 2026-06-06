@@ -18,12 +18,12 @@
 
 #ifdef KFR_FFT
 
-#include "perception/kfr_fft.h"
+#include "perception/kfr_fft_transformer.h"
 
 #endif
 #ifdef KISS_FFT
 
-#include "perception/kiss_fft.h"
+#include "perception/kiss_fft_transformer.h"
 
 #endif
 
