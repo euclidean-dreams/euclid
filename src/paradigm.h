@@ -18,9 +18,6 @@ using namespace cosmology;
 ////// constants
 ///////////
 
-// power of 2 >= 256
-#define FFT_FRAME_SIZE 512
-
 namespace euclid {
 
 extern int render_width;
