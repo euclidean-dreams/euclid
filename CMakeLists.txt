@@ -144,6 +144,8 @@ endif ()
 add_subdirectory(lib/cosmology)
 target_link_libraries(euclid PRIVATE cosmology)
 target_link_libraries(euclid PRIVATE cosmology_selections)
+add_compile_definitions(FFT_FRAME_SIZE=512)
+add_compile_definitions(FFT_WINDOW_SIZE=8)
 
 
 ############
